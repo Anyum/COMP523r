@@ -222,9 +222,19 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
+// Needed for OpenShift. Remove if not using OpenShift
+var IP_ADDRESS = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var PORT = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
+app.listen(PORT, IP_ADDRESS,() => {
+    console.log(`Express server listening on port ${PORT} in ${app.settings.env} mode`);
+});
+
+/* Add this back in if not using OpenShift
 app.listen(app.get('port'), () => {
   console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env')); 
   console.log('  Press CTRL-C to stop\n');
 });
+*/
 
 module.exports = app;
