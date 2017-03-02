@@ -50,7 +50,16 @@ const app = express();
  */
 mongoose.Promise = global.Promise;
 // mongodb://userGS2:vLX3BJhKrk84h7pD@10.1.6.165:27017/sampledb
-mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME || process.env.MONGOLAB_URI);
+var connection_string = "mongodb://localhost:27017/sampledb";
+if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
+    connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+        process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+        process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+        process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+        process.env.OPENSHIFT_APP_NAME;
+}
+console.log('attempting to connect to MongoDB at ' + connection_string);
+mongoose.connect(connection_string);
 mongoose.connection.on('error', () => {
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
