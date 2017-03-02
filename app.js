@@ -54,8 +54,8 @@ var connection_string = "mongodb://localhost:27017/sampledb";
 if(process.env.MONGODB_PASSWORD){
     connection_string = process.env.MONGODB_USER + ":" +
         process.env.MONGODB_PASSWORD + "@" +
-        process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-        process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+        process.env.MONGODB_IP + ':' +
+        process.env.MONGODB_PORT + '/' +
         process.env.MONGODB_DATABASE;
 }
 console.log('attempting to connect to MongoDB at ' + connection_string);
