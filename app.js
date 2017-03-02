@@ -52,7 +52,8 @@ mongoose.Promise = global.Promise;
 // mongodb://userGS2:vLX3BJhKrk84h7pD@10.1.6.165:27017/sampledb
 var connection_string = "mongodb://localhost:27017/sampledb";
 if(process.env.MONGODB_PASSWORD){
-    connection_string = process.env.MONGODB_USER + ":" +
+    connection_string = "mongodb://" +
+        process.env.MONGODB_USER + ":" +
         process.env.MONGODB_PASSWORD + "@" +
         process.env.MONGODB_IP + ':' +
         process.env.MONGODB_PORT + '/' +
