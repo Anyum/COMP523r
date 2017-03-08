@@ -49,7 +49,6 @@ const app = express();
  * Connect to MongoDB.
  */
 mongoose.Promise = global.Promise;
-// mongodb://userGS2:vLX3BJhKrk84h7pD@10.1.6.165:27017/sampledb
 var connection_string = "mongodb://localhost:27017/sampledb";
 if(process.env.MONGODB_PASSWORD){
     connection_string = "mongodb://" +
