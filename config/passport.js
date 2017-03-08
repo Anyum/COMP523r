@@ -529,3 +529,16 @@ exports.isAuthorized = (req, res, next) => {
     res.redirect(`/auth/${provider}`);
   }
 };
+
+/**
+ * Check if user is an Instructor
+ */
+exports.isInstructor = (req, res, next) => {
+  const user = req.user;
+
+  if(user.isInstructor){
+    next();
+  } else {
+    res.send('you are not an instructor!!');
+  }
+};
