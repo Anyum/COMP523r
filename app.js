@@ -144,7 +144,8 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-app.get('/instructor_dashboard',passportConfig.isInstructor, instructorController.index);
+// check if they are logged in, then check if they are an instructor, only then let them get the page
+app.get('/instructor_dashboard',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.index);
 
 /**
  * API examples routes.
