@@ -31,7 +31,7 @@ dotenv.load({ path: '.env.example' });
  * Controllers (route handlers).
  */
 const homeController = require('./controllers/home');
-const instructorController = require('./controllers/instructorDashboard');
+const instructorController = require('./controllers/instructor');
 const userController = require('./controllers/user');
 const contactController = require('./controllers/contact');
 const clientController = require('./controllers/client');
