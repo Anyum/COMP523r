@@ -146,6 +146,8 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 // check if they are logged in, then check if they are an instructor, only then let them get the page
 app.get('/instructor-dashboard',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
+app.get('/client-information', clientController.getClientInformation);
+app.get('/client-agreement', clientController.getClientAgreement);
 app.get('/client-form', clientController.getClientForm);
 app.post('/client-form', clientController.postClientForm);
 

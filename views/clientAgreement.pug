@@ -1,8 +1,9 @@
 extends layout
 
 block content
+  // TODO: Make this page
   .page-header
-    h3 Client Submission form
+    h3 Client Terms and Agreement
 
   form.form-horizontal(method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
@@ -18,7 +19,6 @@ block content
       label(class='col-sm-2 control-label', for='description') Description
       .col-sm-8
         textarea.form-control(name='description', id='description', rows='7')
-    // TODO: Make this a drop-down with automatically populated fields for the upcoming terms
     .form-group
       label(class='col-sm-2 control-label', for='term') What school term are you applying for?
       .col-sm-8

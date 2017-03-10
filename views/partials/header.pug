@@ -13,10 +13,11 @@
       ul.nav.navbar-nav
         li(class=(title == 'Home') ? 'active' : undefined)
           a(href='/') Home
+        li(class=(title == 'Prospective Clients') ? 'active' : undefined)
+          a(href='/client-information') Prospective Clients
         li(class=(title == 'Contact') ? 'active' : undefined)
           a(href='/contact') Contact
-        li
-          a(href='/status') Status
+
       ul.nav.navbar-nav.navbar-right
         if !user
           li(class=(title == 'Login') ? 'active' : undefined)
