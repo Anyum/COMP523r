@@ -1,11 +1,18 @@
+const Client = require('../models/Client');
+
 /**
  * GET /
- * Home page.
+ * Dashboard.
  */
-exports.index = (req, res) => {
+// TODO: Find out why request count is not accurate
+var requests = 0;
+exports.getDashboard = (req, res) => {
+    Client.count({isDecided: false}, function (err, c) {
+        console.log('Count is ' + c);
+        requests = c;
+    });
     res.render('instructorDashboard', {
-        title: 'Instructor Dashboard',
-        // TODO: implement ClientReqest.js MongoDB model, and write mongoose query here to count pending client requests
-        pendingClientRequests: '0'
+        pendingClientRequests: requests,
+        title: 'Instructor Dashboard'
     });
 };
