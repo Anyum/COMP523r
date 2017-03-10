@@ -4,15 +4,13 @@ const Client = require('../models/Client');
  * GET /
  * Dashboard.
  */
-// TODO: Find out why request count is not accurate
-var requests = 0;
 exports.getDashboard = (req, res) => {
-    Client.count({isDecided: false}, function (err, c) {
-        console.log('Count is ' + c);
-        requests = c;
-    });
-    res.render('instructorDashboard', {
-        pendingClientRequests: requests,
-        title: 'Instructor Dashboard'
+    // Count the number of client requests where instructor has not yet decided whether they are approved or not
+    Client.count({isDecided: false}, (err, count) => {
+        console.log('Count is ' + count);
+        res.render('instructorDashboard', {
+            title: 'Instructor Dashboard',
+            pendingClientRequests: count
+        });
     });
 };
