@@ -4,7 +4,7 @@ const passport = require('passport');
 const Client = require('../models/Client');
 
 /**
- * GET /client-information
+ * GET /client/information
  * Information for prospective clients on the class
  * From here they are directed to fill out client agreement.
  */
@@ -15,7 +15,7 @@ exports.getClientInformation = (req, res) => {
 };
 
 /**
- * GET /client-agreement
+ * GET /client/agreement
  * Client agreement and disclaimer.
  * From here they are directed to fill out the client form.
  */
@@ -26,7 +26,7 @@ exports.getClientAgreement = (req, res) => {
 };
 
 /**
- * POST /client-agreement
+ * POST /client/agreement
  * Make sure they have checked the boxes, then pass them on to the client form.
  */
 // TODO: make this function
@@ -48,8 +48,6 @@ exports.postClientAgreement = (req, res, next) => {
  * Client Submission page.
  */
 exports.getClientForm = (req, res) => {
-    // TODO: Make sure that they are coming from the client information page
-    console.log(req.originalUrl);
     res.render('clientForm', {
         title: 'Client Submission Form'
     });
@@ -73,6 +71,7 @@ exports.postClientForm = (req, res, next) => {
 
   const client = new Client({
     email: req.body.email,
+    project: req.body.project,
     description: req.body.description,
     name: req.body.name,
     term: req.body.term,
@@ -80,7 +79,6 @@ exports.postClientForm = (req, res, next) => {
     isApproved: false
   });
 
-  //TODO: Make sure this code snippet works
   client.save((err) => {
       if (err) { throw err; }
       else res.redirect('/submission-successful');

@@ -9,15 +9,19 @@ block content
     .form-group
       label(class='col-sm-2 control-label', for='name') Name
       .col-sm-8
-        input.form-control(type='text', name='name', id='name', autofocus=true)
+        input.form-control(type='text', name='name', id='name', placeholder='Name', autofocus=true)
     .form-group
       label(class='col-sm-2 control-label', for='email') Email
       .col-sm-8
-        input.form-control(type='text', name='email', id='email')
+        input.form-control(type='text', name='email', id='email', placeholder='Email')
     .form-group
-      label(class='col-sm-2 control-label', for='description') Description
+      label(class='col-sm-2 control-label', for='project') Project Title
       .col-sm-8
-        textarea.form-control(name='description', id='description', rows='7')
+        input.form-control(type='text', name='project', id='project', placeholder='Project Title')
+    .form-group
+      label(class='col-sm-2 control-label', for='description') Project Description
+      .col-sm-8
+        textarea.form-control(name='description', id='description', placeholder='Please provide a comprehensive description of your project', rows='10')
     .form-group
       label(class='col-sm-2 control-label', for='term') What school term are you applying for?
       .col-sm-8

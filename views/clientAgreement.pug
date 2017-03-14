@@ -1,30 +1,17 @@
 extends layout
 
 block content
-  // TODO: Make this page
+  //TODO: Make this page
   .page-header
     h3 Client Terms and Agreement
 
-  form.form-horizontal(method='POST')
-    input(type='hidden', name='_csrf', value=_csrf)
-    .form-group
-      label(class='col-sm-2 control-label', for='name') Name
-      .col-sm-8
-        input.form-control(type='text', name='name', id='name', autofocus=true)
-    .form-group
-      label(class='col-sm-2 control-label', for='email') Email
-      .col-sm-8
-        input.form-control(type='text', name='email', id='email')
-    .form-group
-      label(class='col-sm-2 control-label', for='description') Description
-      .col-sm-8
-        textarea.form-control(name='description', id='description', rows='7')
-    .form-group
-      label(class='col-sm-2 control-label', for='term') What school term are you applying for?
-      .col-sm-8
-        select.form-control(name='term', id='term')
-    .form-group
-      .col-sm-offset-2.col-sm-8
-        button.btn.btn-primary(type='submit')
-          i.fa.fa-envelope
-          | Send
+  h4 What is COMP 523
+  p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse turpis sem, laoreet id pulvinar a, egestas eget massa. Integer commodo venenatis tincidunt. Morbi sagittis interdum nibh in finibus. In congue sem vel mi hendrerit hendrerit. Fusce finibus, arcu eu egestas eleifend, nisi lectus lacinia sem, vel blandit augue velit elementum nunc. Sed libero nibh, blandit at sagittis ut, sodales id lacus. Aenean tristique rutrum pretium. Maecenas in faucibus urna, non condimentum est. Suspendisse nec fringilla nisl. Fusce elit elit, sagittis eget nunc dictum, pulvinar semper eros. Etiam a interdum erat. Etiam ultricies, metus vel consectetur semper, lacus arcu mattis nibh, vitae ultricies nulla risus eu nisl. Praesent semper lorem id accumsan suscipit. Maecenas ornare mauris id ipsum tempor laoreet. Nulla aliquam lectus eget lobortis blandit.
+  hr
+
+  h4 Where do you come in?
+  p Nam blandit volutpat felis pharetra dapibus. Vestibulum lobortis pulvinar feugiat. Nulla in nisi non urna dictum viverra. Vestibulum gravida eget erat a cursus. Maecenas accumsan turpis ut nunc varius euismod. Nulla dignissim maximus justo vitae interdum. Etiam vel arcu et ipsum euismod fringilla. Nullam lobortis risus eros, non gravida mi semper eget. Pellentesque eu tortor vel leo vestibulum ultrices. Sed congue dapibus rutrum.
+  hr
+
+  h4 Still Interested?
+  a.btn.btn-default(href='/client/form', role='button') Start your application »

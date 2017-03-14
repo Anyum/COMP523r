@@ -144,12 +144,19 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+/*
+ * Instructor
+ */
 // check if they are logged in, then check if they are an instructor, only then let them get the page
-app.get('/instructor-dashboard',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
-app.get('/client-information', clientController.getClientInformation);
-app.get('/client-agreement', clientController.getClientAgreement);
-app.get('/client-form', clientController.getClientForm);
-app.post('/client-form', clientController.postClientForm);
+app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
+app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
+/*
+ * Client
+ */
+app.get('/client/information', clientController.getClientInformation);
+app.get('/client/agreement', clientController.getClientAgreement);
+app.get('/client/form', clientController.getClientForm);
+app.post('/client/form', clientController.postClientForm);
 
 /**
  * Error Handler.

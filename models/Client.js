@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const clientRequestSchema = new mongoose.Schema({
   email: String,
   name: String,
+  project: String,
   description: String,
   term: String,
   isDecided: Boolean,
