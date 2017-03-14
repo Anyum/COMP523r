@@ -33,28 +33,8 @@ exports.getClientProposals = (req, res) => {
  * Submit instructor's approval/denials.
  */
 exports.postClientProposals= (req, res) => {
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('description', 'Description must be at least 50 characters long').len(50);
-    req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-    const errors = req.validationErrors();
-
-    if (errors) {
-        req.flash('errors', errors);
-        return res.redirect('/client-form');
-    }
-
-    const client = new Client({
-        email: req.body.email,
-        description: req.body.description,
-        name: req.body.name,
-        term: req.body.term,
-        isDecided: false,
-        isApproved: false
-    });
-
-    client.save((err) => {
-        if (err) { throw err; }
-        else res.redirect('/submission-successful');
-    });
+    // TODO: Implement this properly
+    console.log('Recieved request for ' + req.body.clientID);
+    console.log('This instructor ' + req.body.Decision + ' this request');
+    res.redirect('/instructor/client-proposals');
 };
