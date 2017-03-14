@@ -18,15 +18,14 @@ block content
       label(class='col-sm-2 control-label', for='description') Description
       .col-sm-8
         textarea.form-control(name='description', id='description', rows='7')
-    // TODO: Make this a drop-down with automatically populated fields for the upcoming terms
     .form-group
       label(class='col-sm-2 control-label', for='term') What school term are you applying for?
       .col-sm-8
         select.form-control(name='term', id='term')
-          - let d = new Date();
-          - let y = d.getFullYear();
-          - let nextyear = y + 1;
-          - let m = d.getMonth();
+          - var d = new Date();
+          - var y = d.getFullYear();
+          - var nextyear = y + 1;
+          - var m = d.getMonth();
           //- if we are still in January or February, let teachers sign up for Spring course
           - if (m < 2) {
             option= 'Spring ' + y
