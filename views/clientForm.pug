@@ -23,6 +23,18 @@ block content
       label(class='col-sm-2 control-label', for='term') What school term are you applying for?
       .col-sm-8
         select.form-control(name='term', id='term')
+          - let d = new Date();
+          - let y = d.getFullYear();
+          - let nextyear = y + 1;
+          - let m = d.getMonth();
+          //- if we are still in January or February, let teachers sign up for Spring course
+          - if (m < 2) {
+            option= 'Spring ' + y
+            option= 'Fall ' + nextyear
+          - } else {
+            option= 'Fall ' + y
+            option= 'Spring ' + nextyear
+          - }
     .form-group
       .col-sm-offset-2.col-sm-8
         button.btn.btn-primary(type='submit')
