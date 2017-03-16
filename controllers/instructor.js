@@ -36,8 +36,8 @@ exports.getClientProposals = (req, res) => {
  * Change the client's values of isDecided and isApproved accordingly
  */
 exports.postClientProposals= (req, res) => {
-    let decision = req.body.Decision;
-    let clientID = req.body.clientID;
+    var decision = req.body.Decision;
+    var clientID = req.body.clientID;
     console.log('Recieved request for ' + clientID);
     console.log('This instructor ' + decision + ' this request');
     // Find the client that the instructor approved/denied. Process CRUD.
