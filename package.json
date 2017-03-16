@@ -1,5 +1,5 @@
 {
-  "name": "COMP 523 UNC",
+  "name": "unc-comp-523-manager",
   "version": "4.3.0",
   "main": "app.js",
   "scripts": {
