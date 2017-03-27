@@ -158,7 +158,7 @@ app.get('/client/information', clientController.getClientInformation);
 app.get('/client/agreement', clientController.getClientAgreement);
 app.get('/client/form', clientController.getClientForm);
 app.post('/client/form', clientController.postClientForm);
-
+app.get('/client/client-times', clientController.getClientTime);
 /**
  * Error Handler.
  */

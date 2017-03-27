@@ -54,6 +54,21 @@ exports.getClientForm = (req, res) => {
 };
 
 /**
+ * GET /client-times
+ * Filling out preferred time slots
+ */
+exports.getClientTime = (req, res) => {
+    Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
+        // console.log(Clients);
+        if (err) return handleError(err);
+        res.render('clientTimes', {
+            title: 'Time Selection',
+            clients: Clients
+        });
+    });
+};
+
+/**
  * POST /client-form
  * Submit a client request.
  */

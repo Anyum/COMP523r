@@ -1,0 +1,26 @@
+extends layout
+
+//-
+    Select name of client in dropdown
+    Use preset time slots to choose from
+    Store the numbers of the slots chosen in the database
+    Use those numbers to determine final schedule
+
+block content
+    .page-header
+        h3 Select Preferred Time Slots
+
+    form.form-horizontal(method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+            label(class='col-sm-2 control-label', for='name') Select your name:
+            .col-sm-8
+                select.form-control(name='name', id='name')
+                    each client in clients
+                        option= client.name
+
+        .form-group
+            .col-sm-offset-2.col-sm-8
+                button.btn.btn-primary(type='submit')
+                    i.fa.fa-envelope
+                    | Send
