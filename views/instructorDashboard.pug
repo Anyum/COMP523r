@@ -5,11 +5,18 @@ block content
     p.lead Manage new client requests, create student teams, and manage student teams
     hr
     .row
-            h2 Review Client Requests
+            h2 Manage Client Requests
             p
+                //if pendingClientRequests
+                | You have
+                strong  #{approvedClientRequests}
+                |  approved client requests
                 | You have
                 strong  #{pendingClientRequests}
                 |  pending client requests
+                | You have
+                strong  #{rejectedClientRequests}
+                |  rejected client requests
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
     hr
