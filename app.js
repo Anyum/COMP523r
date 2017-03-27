@@ -35,6 +35,7 @@ const instructorController = require('./controllers/instructor');
 const userController = require('./controllers/user');
 const contactController = require('./controllers/contact');
 const clientController = require('./controllers/client');
+const studentController = require('./controllers/student');
 
 /**
  * API keys and Passport configuration.
@@ -158,6 +159,12 @@ app.get('/client/information', clientController.getClientInformation);
 app.get('/client/agreement', clientController.getClientAgreement);
 app.get('/client/form', clientController.getClientForm);
 app.post('/client/form', clientController.postClientForm);
+
+
+/**
+ * Student routes
+ */
+app.get('/student', studentController.getStudentForm);
 
 /**
  * Error Handler.
