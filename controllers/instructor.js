@@ -8,10 +8,21 @@ exports.getDashboard = (req, res) => {
     // Count the number of client requests where instructor has not yet decided whether they are approved or not
     Client.count({isDecided: false}, (err, count) => {
         if (err) return handleError(err);
-        res.render('instructorDashboard', {
-            title: 'Instructor Dashboard',
-            pendingClientRequests: count
-        });
+        count1 = count;
+    });
+    Client.count({isDecided: true, isApproved: false}, (err, count) => {
+        if (err) return handleError(err);
+        count2 = count;
+    });
+    Client.count({isDecided: true, isApproved: true}, (err, count) => {
+        if (err) return handleError(err);
+        count3 = count;
+    });
+    res.render('instructorDashboard', {
+        title: 'Instructor Dashboard',
+        pendingClientRequests: count1,
+        rejectedClientRequests: count2,
+        approvedClientRequests: count3
     });
 };
 
@@ -50,13 +61,18 @@ exports.postClientProposals= (req, res) => {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('/instructor/client-proposals');
             });
-        } else {
+        } else if (decision == 'Deny') {
             client.isDecided = true;
             client.isApproved = false;
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('/instructor/client-proposals');
             });
-        }
+        } else if (decision == 'Delete') {
+            client.remove(function (err) {
+                if (err) { return res.status(500).send(err); }
+                else return res.redirect('/instructor/client-proposals');
+            });
+        };
     });
 };
