@@ -61,13 +61,18 @@ exports.postClientProposals= (req, res) => {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('/instructor/client-proposals');
             });
-        } else {
+        } else if (decision == 'Deny') {
             client.isDecided = true;
             client.isApproved = false;
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('/instructor/client-proposals');
             });
-        }
+        } else if (decision == 'Delete') {
+            client.remove(function (err) {
+                if (err) { return res.status(500).send(err); }
+                else return res.redirect('/instructor/client-proposals');
+            });
+        };
     });
 };

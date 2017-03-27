@@ -34,3 +34,8 @@ block content
                                 input(type='hidden', name='clientID', value= client._id)
                                 input(type='hidden', name='Decision', value= 'Deny')
                                 button.btn.btn-secondary.pull-right(type='submit', value='Deny') Deny
+                            form(method='POST')
+                                input(type='hidden', name='_csrf', value=_csrf)
+                                input(type='hidden', name='clientID', value= client._id)
+                                input(type='hidden', name='Decision', value= 'Delete')
+                                button.btn.btn-secondary.btn-danger.pull-right(type='submit', value='Delete') Delete
