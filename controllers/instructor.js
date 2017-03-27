@@ -1,28 +1,49 @@
 const Client = require('../models/Client');
+const async = require('async');
 
 /**
  * GET /
  * Dashboard.
  */
 exports.getDashboard = (req, res) => {
-    // Count the number of client requests where instructor has not yet decided whether they are approved or not
-    Client.count({isDecided: false}, (err, count) => {
-        if (err) return handleError(err);
-        count1 = count;
-    });
-    Client.count({isDecided: true, isApproved: false}, (err, count) => {
-        if (err) return handleError(err);
-        count2 = count;
-    });
-    Client.count({isDecided: true, isApproved: true}, (err, count) => {
-        if (err) return handleError(err);
-        count3 = count;
-    });
-    res.render('instructorDashboard', {
-        title: 'Instructor Dashboard',
-        pendingClientRequests: count1,
-        rejectedClientRequests: count2,
-        approvedClientRequests: count3
+    var locals = {};
+    // process all 3 queries in parallel
+    // all queries return a `callback` when complete
+    // waits for all 3 callbacks to process asynchronously, then proceeds
+    async.parallel([
+        // Undecided client proposals
+        function(callback) {
+            Client.count({isDecided: false}, (err, count) => {
+                if (err) return callback(err);
+                locals.undecided = count;
+                callback();
+            });
+        },
+        // Rejected client proposals
+        function(callback) {
+            Client.count({isDecided: true, isApproved: false}, (err, count) => {
+                if (err) return callback(err);
+                locals.rejected = count;
+                callback();
+            });
+        },
+        // Approved client proposals
+        function(callback) {
+            Client.count({isDecided: true, isApproved: true}, (err, count) => {
+                if (err) return callback(err);
+                locals.approved = count;
+                callback();
+            });
+        }
+    ], function(err) { //This function gets called after the three tasks have called their "task callbacks"
+        if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
+        //Here `locals` will be an object with `undecided`, `rejected` and `approved` keys
+        res.render('instructorDashboard', {
+            title: 'Instructor Dashboard',
+            pendingClientRequests: locals.undecided,
+            rejectedClientRequests: locals.rejected,
+            approvedClientRequests: locals.approved
+        });
     });
 };
 
