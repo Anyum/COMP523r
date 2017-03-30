@@ -9,6 +9,9 @@ html
     title #{title} - COMP 523 UNC
     link(rel='shortcut icon', href='/favicon.png')
     link(rel='stylesheet', href='/css/main.css')
+    script(src='/js/lib/jquery-2.2.4.min.js')
+    script(src='/js/lib/bootstrap.min.js')
+    script(src='/js/main.js')
 
   body
     include partials/header
@@ -18,10 +21,6 @@ html
       block content
 
     include partials/footer
-
-    script(src='/js/lib/jquery-2.2.4.min.js')
-    script(src='/js/lib/bootstrap.min.js')
-    script(src='/js/main.js')
 
     // Google Analytics: change UA-XXXXX-X to be your site's ID
     script.

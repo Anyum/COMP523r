@@ -10,7 +10,7 @@ const Client = require('../models/Client');
  */
 exports.getClientInformation = (req, res) => {
     res.render('clientInformation', {
-        title: 'Information for Clients'
+        title: 'Prospective Clients'
     });
 };
 

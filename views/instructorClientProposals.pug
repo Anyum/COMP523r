@@ -1,15 +1,15 @@
 extends layout
 
 block content
-    script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js")
-    .page-header
-        h3 Manage Client Project Proposals
-        button.pending.btn.btn-warning.btn-sm(type='button') Pending
-        button.approved.btn.btn-success.btn-sm(type='button') Approved
-        button.rejected.btn.btn-danger.btn-sm(type='button') Rejected
+    #breadcrumb
+    h3 Manage Client Project Proposals
+    button.pending.btn.btn-warning.btn-sm(type='button') Pending
+    button.approved.btn.btn-success.btn-sm(type='button') Approved
+    button.rejected.btn.btn-danger.btn-sm(type='button') Rejected
     #dynamic
     //Dynamically populate based on selected type of proposal, with pending as default
     script
+        | $('#breadcrumb').append(createBreadcrumb());
         | $.get('pendingProjects').then(function(html) {
         |   $('#dynamic').append(html);
         | });
