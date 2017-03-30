@@ -153,6 +153,7 @@ app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor
 app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
 app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);
+app.post('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailClients);
 
 // Dynamic content for client-proposals
 app.get('/instructor/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedProjects);

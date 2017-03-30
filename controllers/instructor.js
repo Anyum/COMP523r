@@ -1,5 +1,14 @@
 const Client = require('../models/Client');
 const async = require('async');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASSWORD
+    }
+});
 
 /**
  * GET /
@@ -140,5 +149,39 @@ exports.postClientProposals= (req, res) => {
 exports.getEmailClients = (req, res) => {
     res.render('instructor/instructorEmailClients',{
         title: 'Manage client emails'
+    });
+};
+
+/**
+ * POST /instructor/email-clients
+ * Send an email via Nodemailer.
+ */
+exports.postEmailClients = (req, res) => {
+    req.assert('name', 'Name cannot be blank').notEmpty();
+    req.assert('email', 'Email is not valid').isEmail();
+    req.assert('message', 'Message cannot be blank').notEmpty();
+
+    const errors = req.validationErrors();
+
+    if (errors) {
+        req.flash('errors', errors);
+        return res.redirect('/contact');
+    }
+
+    // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
+    const mailOptions = {
+        to: 'your@email.com',
+        from: `${req.body.name} <${req.body.email}>`,
+        subject: 'Contact Form | Hackathon Starter',
+        text: req.body.message
+    };
+
+    transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+            req.flash('errors', { msg: err.message });
+            return res.redirect('/contact');
+        }
+        req.flash('success', { msg: 'Email has been sent successfully!' });
+        res.redirect('/contact');
     });
 };
