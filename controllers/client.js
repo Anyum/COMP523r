@@ -86,7 +86,9 @@ exports.postClientForm = (req, res, next) => {
 
   const client = new Client({
     email: req.body.email,
+    organization: req.body.organization,
     project: req.body.project,
+    presentation: req.body.presentation,
     description: req.body.description,
     name: req.body.name,
     term: req.body.term,
