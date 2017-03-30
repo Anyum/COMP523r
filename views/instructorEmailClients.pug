@@ -1,0 +1,33 @@
+extends layout
+
+block content
+    #breadcrumb
+    h3 Manage Client Emails
+    button.pending.btn.btn-warning.btn-sm(type='button') Pending
+    button.approved.btn.btn-success.btn-sm(type='button') Approved
+    button.rejected.btn.btn-danger.btn-sm(type='button') Rejected
+    #dynamic
+    //Dynamically populate based on selected type of proposal, with pending as default
+    script
+        | $('#breadcrumb').append(createBreadcrumb());
+        | $.get('pendingProjects').then(function(html) {
+        |   $('#dynamic').append(html);
+        | });
+        | $(".pending").on("click", function(){
+        |   $.get('pendingProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })
+        | $(".approved").on("click", function(){
+        |   $.get('approvedProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })
+        | $(".rejected").on("click", function(){
+        |   $.get('rejectedProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })

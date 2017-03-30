@@ -132,3 +132,13 @@ exports.postClientProposals= (req, res) => {
         };
     });
 };
+
+/**
+ * GET /instructor/email-clients
+ * Display all pending client proposals, and all approval/denial by instructor.
+ */
+exports.getEmailClients = (req, res) => {
+    res.render('instructorEmailClients',{
+        title: 'Manage client emails'
+    });
+};

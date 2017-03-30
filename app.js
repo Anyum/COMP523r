@@ -152,6 +152,7 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
 app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
+app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);
 
 // Dynamic content for client-proposals
 app.get('/instructor/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedProjects);
