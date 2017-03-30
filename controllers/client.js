@@ -39,7 +39,7 @@ exports.postClientAgreement = (req, res, next) => {
 
     if (errors) {
         req.flash('errors', errors);
-        return res.redirect('/client-form');
+        return res.redirect('/client/form');
     }
 };
 
