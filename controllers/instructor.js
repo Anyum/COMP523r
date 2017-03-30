@@ -38,7 +38,7 @@ exports.getDashboard = (req, res) => {
     ], function(err) { //This function gets called after the three tasks have called their "task callbacks"
         if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
         //Here `locals` will be an object with `undecided`, `rejected` and `approved` keys
-        res.render('instructorDashboard', {
+        res.render('instructor/instructorDashboard', {
             title: 'Instructor Dashboard',
             pendingClientRequests: locals.undecided,
             rejectedClientRequests: locals.rejected,
@@ -52,7 +52,7 @@ exports.getDashboard = (req, res) => {
  * Display all pending client proposals, and all approval/denial by instructor.
  */
 exports.getClientProposals = (req, res) => {
-    res.render('instructorClientProposals',{
+    res.render('instructor/instructorClientProposals',{
         title: 'Review Client Proposals'
     });
 };
@@ -64,7 +64,7 @@ exports.getClientProposals = (req, res) => {
 exports.getPendingProjects = (req, res) => {
     Client.find({isDecided: false}, (err, Clients) => {
         if (err) return handleError(err);
-        res.render('pendingProjects', {
+        res.render('instructor/pendingProjects', {
             title: 'Pending Client Proposals',
             clients: Clients
         });
@@ -77,7 +77,7 @@ exports.getPendingProjects = (req, res) => {
 exports.getApprovedProjects = (req, res) => {
     Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
         if (err) return handleError(err);
-        res.render('approvedProjects', {
+        res.render('instructor/approvedProjects', {
             title: 'Approved Client Proposals',
             clients: Clients
         });
@@ -90,7 +90,7 @@ exports.getApprovedProjects = (req, res) => {
 exports.getRejectedProjects = (req, res) => {
     Client.find({isDecided: true, isApproved: false}, (err, Clients) => {
         if (err) return handleError(err);
-        res.render('rejectedProjects', {
+        res.render('instructor/rejectedProjects', {
             title: 'Rejected Client Proposals',
             clients: Clients
         });
@@ -138,7 +138,7 @@ exports.postClientProposals= (req, res) => {
  * Display all pending client proposals, and all approval/denial by instructor.
  */
 exports.getEmailClients = (req, res) => {
-    res.render('instructorEmailClients',{
+    res.render('instructor/instructorEmailClients',{
         title: 'Manage client emails'
     });
 };

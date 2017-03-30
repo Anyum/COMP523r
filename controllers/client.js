@@ -9,7 +9,7 @@ const Client = require('../models/Client');
  * From here they are directed to fill out client agreement.
  */
 exports.getClientInformation = (req, res) => {
-    res.render('clientInformation', {
+    res.render('client/clientInformation', {
         title: 'Prospective Clients'
     });
 };
@@ -20,7 +20,7 @@ exports.getClientInformation = (req, res) => {
  * From here they are directed to fill out the client form.
  */
 exports.getClientAgreement = (req, res) => {
-    res.render('clientAgreement', {
+    res.render('client/clientAgreement', {
         title: 'Client Agreement'
     });
 };
@@ -48,7 +48,7 @@ exports.postClientAgreement = (req, res, next) => {
  * Client Submission page.
  */
 exports.getClientForm = (req, res) => {
-    res.render('clientForm', {
+    res.render('client/clientForm', {
         title: 'Client Submission Form'
     });
 };
@@ -61,7 +61,7 @@ exports.getClientTime = (req, res) => {
     Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
         // console.log(Clients);
         if (err) return handleError(err);
-        res.render('clientTimes', {
+        res.render('client/clientTimes', {
             title: 'Time Selection',
             clients: Clients
         });

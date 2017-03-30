@@ -1,5 +1,5 @@
 exports.getStudentForm = (req, res) => {
-    res.render('studentForm', {
+    res.render('student/studentForm', {
         title: 'Student Form'
     });
 };
