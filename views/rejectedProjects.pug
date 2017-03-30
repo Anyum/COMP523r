@@ -1,0 +1,35 @@
+.page-header
+    h4 Rejected Client Proposals:
+if clients
+    each client in clients
+        .panel.panel-default
+            .panel-heading
+                h5= client.project
+            .li.list-group-item
+                h5.list-group-item-heading Name:
+                p.card-text= client.name
+            .li.list-group-item
+                h5.list-group-item-heading Email:
+                p.card-text= client.email
+            .li.list-group-item
+                h5.list-group-item-heading Description:
+                p.card-text= client.description
+            .li.list-group-item
+                h5.list-group-item-heading Applying for:
+                p.card-text= client.term
+            .panel-footer
+                .row
+                    .col-xs-6
+                        form(method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='clientID', value= client._id)
+                            input(type='hidden', name='Decision', value= 'Approve')
+                            button.btn.btn-success.btn-sm(type='submit', value='Approve') Approve
+                    .col-xs-6
+                        form(method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='clientID', value= client._id)
+                            input(type='hidden', name='Decision', value= 'Delete')
+                            button.btn.btn-danger.btn-sm.pull-right(type='submit', value='Delete') Delete
+else
+    p   "There are no rejected client proposals"

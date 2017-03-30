@@ -1,41 +1,34 @@
 extends layout
 
 block content
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js")
     .page-header
-        h3 Approve or deny pending client proposals
-    if clients
-        each client in clients
-            .panel.panel-default
-                .panel-heading
-                    h4= client.project
-                .li.list-group-item
-                    h4.list-group-item-heading Name:
-                    p.card-text= client.name
-                .li.list-group-item
-                    h4.list-group-item-heading Email:
-                    p.card-text= client.email
-                .li.list-group-item
-                    h4.list-group-item-heading Description:
-                    p.card-text= client.description
-                .li.list-group-item
-                    h4.list-group-item-heading Applying for:
-                    p.card-text= client.term
-                .panel-footer
-                    .row
-                        .col-xs-6
-                            form(method='POST')
-                                input(type='hidden', name='_csrf', value=_csrf)
-                                input(type='hidden', name='clientID', value= client._id)
-                                input(type='hidden', name='Decision', value= 'Approve')
-                                button.btn.btn-primary(type='submit', value='Approve') Approve
-                        .col-xs-6
-                            form(method='POST')
-                                input(type='hidden', name='_csrf', value=_csrf)
-                                input(type='hidden', name='clientID', value= client._id)
-                                input(type='hidden', name='Decision', value= 'Deny')
-                                button.btn.btn-secondary.pull-right(type='submit', value='Deny') Deny
-                            form(method='POST')
-                                input(type='hidden', name='_csrf', value=_csrf)
-                                input(type='hidden', name='clientID', value= client._id)
-                                input(type='hidden', name='Decision', value= 'Delete')
-                                button.btn.btn-secondary.btn-danger.pull-right(type='submit', value='Delete') Delete
+        br
+        h3 Manage Client Project Proposals
+        button.pending.btn.btn-warning.btn-sm(type='button') Pending
+        button.approved.btn.btn-success.btn-sm(type='button') Approved
+        button.rejected.btn.btn-danger.btn-sm(type='button') Rejected
+    #dynamic
+    //Dynamically populate based on selected type of proposal, with pending as default
+    script
+        | $.get('pendingProjects').then(function(html) {
+        |   $('#dynamic').append(html);
+        | });
+        | $(".pending").on("click", function(){
+        |   $.get('pendingProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })
+        | $(".approved").on("click", function(){
+        |   $.get('approvedProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })
+        | $(".rejected").on("click", function(){
+        |   $.get('rejectedProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })

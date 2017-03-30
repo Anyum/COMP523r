@@ -48,15 +48,50 @@ exports.getDashboard = (req, res) => {
 };
 
 /**
- * GET /instructor/client-submission
+ * GET /instructor/client-proposals
  * Display all pending client proposals, and all approval/denial by instructor.
  */
 exports.getClientProposals = (req, res) => {
+    res.render('instructorClientProposals',{
+        title: 'Review Client Proposals'
+    });
+};
+//The following three GET requests are dynamic content populated in client-proposals
+/**
+ * GET /instructor/pendingProjects
+ * Display all pending client projects
+ */
+exports.getPendingProjects = (req, res) => {
     Client.find({isDecided: false}, (err, Clients) => {
-        // console.log(Clients);
         if (err) return handleError(err);
-        res.render('instructorClientProposals', {
-            title: 'Review Client Proposals',
+        res.render('pendingProjects', {
+            title: 'Pending Client Proposals',
+            clients: Clients
+        });
+    });
+};
+/**
+ * GET /instructor/approvedProjects
+ * Display all approved client projects
+ */
+exports.getApprovedProjects = (req, res) => {
+    Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.render('approvedProjects', {
+            title: 'Approved Client Proposals',
+            clients: Clients
+        });
+    });
+};
+/**
+ * GET /instructor/rejectedProjects
+ * Display all rejected client projects
+ */
+exports.getRejectedProjects = (req, res) => {
+    Client.find({isDecided: true, isApproved: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.render('rejectedProjects', {
+            title: 'Rejected Client Proposals',
             clients: Clients
         });
     });
