@@ -93,7 +93,8 @@ exports.postClientForm = (req, res, next) => {
     name: req.body.name,
     term: req.body.term,
     isDecided: false,
-    isApproved: false
+    isApproved: false,
+    isDeleted: false
   });
 
   client.save((err) => {

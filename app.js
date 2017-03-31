@@ -159,6 +159,7 @@ app.post('/instructor/email-clients',passportConfig.isAuthenticated,passportConf
 app.get('/instructor/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedProjects);
 app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingProjects);
 app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
+app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
 
 /**
  * Client routes

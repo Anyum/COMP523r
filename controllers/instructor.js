@@ -71,7 +71,7 @@ exports.getClientProposals = (req, res) => {
  * Display all pending client projects
  */
 exports.getPendingProjects = (req, res) => {
-    Client.find({isDecided: false}, (err, Clients) => {
+    Client.find({isDecided: false, isDeleted: false}, (err, Clients) => {
         if (err) return handleError(err);
         res.render('instructor/pendingProjects', {
             title: 'Pending Client Proposals',
@@ -84,7 +84,7 @@ exports.getPendingProjects = (req, res) => {
  * Display all approved client projects
  */
 exports.getApprovedProjects = (req, res) => {
-    Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
+    Client.find({isDecided: true, isApproved: true, isDeleted: false}, (err, Clients) => {
         if (err) return handleError(err);
         res.render('instructor/approvedProjects', {
             title: 'Approved Client Proposals',
@@ -97,10 +97,23 @@ exports.getApprovedProjects = (req, res) => {
  * Display all rejected client projects
  */
 exports.getRejectedProjects = (req, res) => {
-    Client.find({isDecided: true, isApproved: false}, (err, Clients) => {
+    Client.find({isDecided: true, isApproved: false, isDeleted: false}, (err, Clients) => {
         if (err) return handleError(err);
         res.render('instructor/rejectedProjects', {
             title: 'Rejected Client Proposals',
+            clients: Clients
+        });
+    });
+};
+/**
+ * GET /instructor/deletedProjects
+ * Display all deleted client projects
+ */
+exports.getDeletedProjects = (req, res) => {
+    Client.find({isDeleted: true}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.render('instructor/deletedProjects', {
+            title: 'Deleted Client Proposals',
             clients: Clients
         });
     });
@@ -122,21 +135,26 @@ exports.postClientProposals= (req, res) => {
         if (decision == 'Approve') {
             client.isDecided = true;
             client.isApproved = true;
+            client.isDeleted = false;
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
-                else return res.redirect('/instructor/client-proposals');
+                else return res.redirect('back');
             });
         } else if (decision == 'Deny') {
             client.isDecided = true;
             client.isApproved = false;
+            client.isDeleted = false;
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
-                else return res.redirect('/instructor/client-proposals');
+                else return res.redirect('back');
             });
         } else if (decision == 'Delete') {
-            client.remove(function (err) {
+            client.isDecided = true;
+            client.isApproved = false;
+            client.isDeleted = true;
+            client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
-                else return res.redirect('/instructor/client-proposals');
+                else return res.redirect('back');
             });
         };
     });

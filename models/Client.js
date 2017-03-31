@@ -9,7 +9,8 @@ const clientRequestSchema = new mongoose.Schema({
   description: String,
   term: String,
   isDecided: Boolean,
-  isApproved: Boolean
+  isApproved: Boolean,
+  isDeleted: Boolean
 
 }, { timestamps: true });
 

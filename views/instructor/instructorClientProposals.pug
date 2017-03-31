@@ -3,9 +3,10 @@ extends ../layout
 block content
     #breadcrumb
     h3 Manage Client Project Proposals
-    button.pending.btn.btn-warning.btn-sm(type='button') Pending
+    button.pending.btn.btn-primary.btn-sm(type='button') Pending
     button.approved.btn.btn-success.btn-sm(type='button') Approved
-    button.rejected.btn.btn-danger.btn-sm(type='button') Rejected
+    button.rejected.btn.btn-warning.btn-sm(type='button') Rejected
+    button.deleted.btn.btn-danger.btn-sm(type='button') Deleted
     #dynamic
     //Dynamically populate based on selected type of proposal, with pending as default
     script
@@ -27,6 +28,12 @@ block content
         | })
         | $(".rejected").on("click", function(){
         |   $.get('rejectedProjects').then(function(html) {
+        |       $('#dynamic').empty();
+        |       $('#dynamic').append(html);
+        |   });
+        | })
+        | $(".deleted").on("click", function(){
+        |   $.get('deletedProjects').then(function(html) {
         |       $('#dynamic').empty();
         |       $('#dynamic').append(html);
         |   });
