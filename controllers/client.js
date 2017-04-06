@@ -94,6 +94,7 @@ exports.postClientForm = (req, res, next) => {
     term: req.body.term,
     isDecided: false,
     isApproved: false,
+    status: 'Pending',
     isDeleted: false
   });
 

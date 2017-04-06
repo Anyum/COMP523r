@@ -136,6 +136,7 @@ exports.postClientProposals= (req, res) => {
             client.isDecided = true;
             client.isApproved = true;
             client.isDeleted = false;
+            client.status = 'Approved';
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('back');
@@ -144,6 +145,7 @@ exports.postClientProposals= (req, res) => {
             client.isDecided = true;
             client.isApproved = false;
             client.isDeleted = false;
+            client.status = 'Rejected';
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('back');
@@ -152,6 +154,16 @@ exports.postClientProposals= (req, res) => {
             client.isDecided = true;
             client.isApproved = false;
             client.isDeleted = true;
+            client.status = 'Deleted';
+            client.save(function (err, client) {
+                if (err) { return res.status(500).send(err); }
+                else return res.redirect('back');
+            });
+        } else if (decision == 'Pending') {
+            client.isDecided = false;
+            client.isApproved = false;
+            client.isDeleted = false;
+            client.status = 'Pending';
             client.save(function (err, client) {
                 if (err) { return res.status(500).send(err); }
                 else return res.redirect('back');

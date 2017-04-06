@@ -3,7 +3,8 @@
   "version": "4.3.0",
   "main": "app.js",
   "scripts": {
-    "start": "supervisor app.js"
+    "start": "node app.js",
+    "test": "mocha --reporter spec"
   },
   "description": "A web-app for teachers, students, and potential clients to interact in the UNC COMP523 class",
   "repository": {
@@ -12,10 +13,6 @@
   },
   "author": "Chris Brajer, Grace Liu, Abby Shatzman, Nathan Ownens, Abu Raja",
   "license": "MIT",
-  "scripts": {
-    "start": "node app.js",
-    "test": "mocha --reporter spec"
-  },
   "dependencies": {
     "async": "^2.1.2",
     "bcrypt-nodejs": "^0.0.3",
@@ -50,7 +47,8 @@
     "request": "^2.78.0",
     "twilio": "^3.3.1-edge",
     "twit": "^2.2.5",
-    "validator": "^6.1.0"
+    "validator": "^6.1.0",
+    "window-popup": "^1.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
