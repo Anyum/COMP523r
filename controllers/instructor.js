@@ -203,3 +203,46 @@ exports.postEmailClients = (req, res) => {
         res.redirect('/contact');
     });
 };
+
+//The following three GET requests for JSON of all client types
+//This is only a slight change to the full page renders. Change this later?
+/**
+ * GET /instructor/pendingProjects
+ * Display all pending client projects
+ */
+exports.getPendingJSON = (req, res) => {
+    Client.find({isDecided: false, isDeleted: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.send(Clients);
+    });
+};
+/**
+ * GET /instructor/approvedProjects
+ * Display all approved client projects
+ */
+exports.getApprovedJSON = (req, res) => {
+    Client.find({isDecided: true, isApproved: true, isDeleted: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.send(Clients);
+    });
+};
+/**
+ * GET /instructor/rejectedProjects
+ * Display all rejected client projects
+ */
+exports.getRejectedJSON = (req, res) => {
+    Client.find({isDecided: true, isApproved: false, isDeleted: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.send(Clients);
+    });
+};
+/**
+ * GET /instructor/deletedProjects
+ * Display all deleted client projects
+ */
+exports.getDeletedJSON = (req, res) => {
+    Client.find({isDeleted: true}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.send(Clients);
+    });
+};

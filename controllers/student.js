@@ -3,3 +3,9 @@ exports.getStudentForm = (req, res) => {
         title: 'Student Form'
     });
 };
+
+exports.getStudentResources = (req, res) => {
+    res.render('student/studentResources', {
+        title: 'Student Resources'
+    });
+};

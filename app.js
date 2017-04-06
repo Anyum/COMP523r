@@ -161,6 +161,12 @@ app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportCon
 app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
 app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
 
+// JSON api
+app.get('/api/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedJSON);
+app.get('/api/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingJSON);
+app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedJSON);
+app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
+
 /**
  * Client routes
  */
@@ -174,6 +180,7 @@ app.get('/client/client-times', clientController.getClientTime);
  * Student routes
  */
 app.get('/student', studentController.getStudentForm);
+app.get('/student/resources', studentController.getStudentResources);
 
 /**
  * Error Handler.

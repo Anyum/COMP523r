@@ -1,40 +1,63 @@
 extends ../layout
+block extraHeader
+    script(src='/js/email.js')
+    style.
+        body {
+            position: relative;
+        }
 
+        ul.nav-pills {
+            position: fixed;
+        }
+
+        div.col-sm-9 div {
+            min-height: 400px;
+        }
+
+        #section1 {
+            color: #fff;
+            background-color: #1E88E5;
+        }
+
+        #section2 {
+            color: #fff;
+            background-color: #673ab7;
+        }
+
+        #section3 {
+            color: #fff;
+            background-color: #ff9800;
+        }
+
+        @media screen and (max-width: 810px) {
+            #section1, #section2, #section3 {
+                margin-left: 150px;
+            }
+        }
 block content
     #breadcrumb
-    h3 Manage Client Emails
-    button.pending.btn.btn-primary.btn-sm(type='button') Pending
-    button.approved.btn.btn-success.btn-sm(type='button') Approved
-    button.rejected.btn.btn-warning.btn-sm(type='button') Rejected
-    button.deleted.btn.btn-danger.btn-sm(type='button') Deleted
-    #dynamic
-    //Dynamically populate based on selected type of proposal, with pending as default
-    script
-        | $('#breadcrumb').append(createBreadcrumb());
-        | $.get('pendingProjects').then(function(html) {
-        |   $('#dynamic').append(html);
-        | });
-        | $(".pending").on("click", function(){
-        |   $.get('pendingProjects').then(function(html) {
-        |       $('#dynamic').empty();
-        |       $('#dynamic').append(html);
-        |   });
-        | })
-        | $(".approved").on("click", function(){
-        |   $.get('approvedProjects').then(function(html) {
-        |       $('#dynamic').empty();
-        |       $('#dynamic').append(html);
-        |   });
-        | })
-        | $(".rejected").on("click", function(){
-        |   $.get('rejectedProjects').then(function(html) {
-        |       $('#dynamic').empty();
-        |       $('#dynamic').append(html);
-        |   });
-        | })
-        | $(".deleted").on("click", function(){
-        |   $.get('deletedProjects').then(function(html) {
-        |       $('#dynamic').empty();
-        |       $('#dynamic').append(html);
-        |   });
-        | })
+    body(data-spy='scroll', data-target='#myScrollspy', data-offset='70')
+        .container
+            .row
+                nav#myScrollspy.col-sm-3
+                    ul.nav.nav-pills.nav-stacked
+                        li.active
+                            a(href='#section1') Choose message type
+                        li
+                            a(href='#section2') Specify recipients
+                        li
+                            a(href='#section3') Customize message
+                .col-sm-9
+                    #section1
+                        h1 Choose what group you are sending to!
+                        p Send an email to:
+                        button.pending.btn.btn-primary.btn-sm(type='button') Pending Clients
+                        button.approved.btn.btn-success.btn-sm(type='button') Approved Clients
+                        button.rejected.btn.btn-warning.btn-sm(type='button') Rejected Clients
+                        button.deleted.btn.btn-danger.btn-sm(type='button') Deleted Clients
+                    #section2
+                        h1 Refine client selection
+                        p Try to scroll this section and look at the navigation list while scrolling!
+                    #section3
+                        h1 Customize your message
+                        p Try to scroll this section and look at the navigation list while scrolling!
