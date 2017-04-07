@@ -18,9 +18,34 @@ block content
                 select.form-control(name='name', id='name')
                     each client in clients
                         option= client.name
+        hr
+        .form-group(name='select-form', id='select-form')
+            .form-inline.col-sm-offset-3
+                .form-group.col-sm-2
+                    .row
+                        select.form-control(multiple='', name='show-available-times', id='select-times')
+                            option test1
+                            option 8:00AM
+                            option 8:50 AM
+                            option test...
+                    .row
+                        label(class='control-label', for='select-times') Available times
+                .form-group.col-sm-2
+                    .btn-group-vertical
+                            button.btn.btn-default.btn-sm
+                                | Add >>
+                            button.btn.btn-default.btn-sm
+                                | << Remove
 
+                .form-group.col-sm-2
+                    .row
+                        select.form-control(multiple='', name='show-selected-times', id='added-times')
+                            option test1
+                            option 8:00AM
+                            option 8:50 AM
+                    .row
+                        label(class='control-label', for='added-times') Selected times
         .form-group
             .col-sm-offset-2.col-sm-8
                 button.btn.btn-primary(type='submit')
-                    i.fa.fa-envelope
                     | Send
