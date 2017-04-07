@@ -95,7 +95,11 @@ exports.postClientForm = (req, res, next) => {
     isDecided: false,
     isApproved: false,
     status: 'Pending',
-    isDeleted: false
+    isDeleted: false,
+    sentApproval: false,
+    sentDenial: false,
+    sentDeletion: false,
+    sentPitchSchedule: false
   });
 
   client.save((err) => {
