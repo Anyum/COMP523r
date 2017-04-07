@@ -1,4 +1,4 @@
-extends layout
+extends ../layout
 
 block content
     h1 Instructor Dashboard
@@ -19,6 +19,12 @@ block content
                 |  rejected client requests
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
+    hr
+    .row
+        h2 Manage Client Emails
+        p Send emails to approved, pending, or rejected clients.
+        p
+            a.btn.btn-default(href='/instructor/email-clients', role='button') View details »
     hr
     .row
         h2 Manage Student Milestones

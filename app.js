@@ -152,6 +152,21 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
 app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
+app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);
+app.post('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailClients);
+
+// Dynamic content for client-proposals
+app.get('/instructor/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedProjects);
+app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingProjects);
+app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
+app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
+
+// JSON api
+app.get('/api/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedJSON);
+app.get('/api/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingJSON);
+app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedJSON);
+app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
+
 /**
  * Client routes
  */
@@ -165,6 +180,7 @@ app.get('/client/client-times', clientController.getClientTime);
  * Student routes
  */
 app.get('/student', studentController.getStudentForm);
+app.get('/student/resources', studentController.getStudentResources);
 
 /**
  * Error Handler.

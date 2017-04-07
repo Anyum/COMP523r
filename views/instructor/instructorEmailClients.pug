@@ -1,0 +1,54 @@
+extends ../layout
+block extraHeader
+    script(src='/js/email.js')
+    style.
+        #section1 {
+            background-color: #d1d6e5;
+            padding-bottom: 10px;
+        }
+
+        #section2 {
+            background-color: #d1d6e5;
+            padding-bottom: 10px;
+        }
+
+        #section3 {
+            background-color: #d1d6e5;
+            padding-bottom: 10px;
+        }
+
+block content
+    #breadcrumb
+    body(data-spy='scroll', data-target='#myScrollspy', data-offset='70')
+        .container
+            .row
+                #section1
+                    h1 Choose what group you are sending to!
+                    p Send an email to:
+                    button.pending.btn.btn-primary.btn-sm(type='button') Pending Clients
+                    button.approved.btn.btn-success.btn-sm(type='button') Approved Clients
+                    button.rejected.btn.btn-warning.btn-sm(type='button') Rejected Clients
+                    button.deleted.btn.btn-danger.btn-sm(type='button') Deleted Clients
+            .row
+                #section2
+                    h1 Refine client selection
+                    #clientSelection
+                        p Choose a group to send an email to, then this box will allow you to refine your search
+            .row
+                #section3
+                    h1 Customize your message
+                    form.form-horizontal(method='POST')
+                        input(type='hidden', name='_csrf', value=_csrf)
+                        .form-group
+                            label(class='col-sm-2 control-label', for='name') To
+                            .col-sm-8
+                                input.form-control(type='text', name='name', id='name')
+                        .form-group
+                            label(class='col-sm-2 control-label', for='message') Body
+                            .col-sm-8
+                                textarea.form-control(name='message', id='message', rows='7', autofocus=true)
+                        .form-group
+                            .col-sm-offset-2.col-sm-8
+                                button.btn.btn-primary(type='submit')
+                                    i.fa.fa-envelope
+                                    | Send

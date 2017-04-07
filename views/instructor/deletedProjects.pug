@@ -1,0 +1,35 @@
+.page-header
+    h4 Deleted Client Proposals:
+if clients
+    each client in clients
+        .panel.panel-default
+            .panel-heading
+                h4 #{client.project}
+            .li.list-group-item
+                strong Name:
+                |  #{client.name}
+            .li.list-group-item
+                strong Email:
+                |  #{client.email}
+            .li.list-group-item
+                strong Organization:
+                |  #{client.organization}
+            .li.list-group-item
+                strong Description:
+                |  #{client.description}
+            .li.list-group-item
+                a(href=client.presentation) Project Presentation / Website URL
+            .li.list-group-item
+                strong Submitted For Term:
+                |  #{client.term}
+            .panel-footer
+                .row
+                    .col-xs-6
+                        strong Current Status:
+                        |  #{client.status}
+                    .col-xs-6
+                        form(method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='clientID', value= client._id)
+                            input(type='hidden', name='Decision', value= 'Pending')
+                            button.btn.btn-primary.btn-sm.pull-right(type='submit', value='Pending') Move Deleted Request to Pending List

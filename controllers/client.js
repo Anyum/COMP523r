@@ -9,8 +9,8 @@ const Client = require('../models/Client');
  * From here they are directed to fill out client agreement.
  */
 exports.getClientInformation = (req, res) => {
-    res.render('clientInformation', {
-        title: 'Information for Clients'
+    res.render('client/clientInformation', {
+        title: 'Prospective Clients'
     });
 };
 
@@ -20,7 +20,7 @@ exports.getClientInformation = (req, res) => {
  * From here they are directed to fill out the client form.
  */
 exports.getClientAgreement = (req, res) => {
-    res.render('clientAgreement', {
+    res.render('client/clientAgreement', {
         title: 'Client Agreement'
     });
 };
@@ -39,7 +39,7 @@ exports.postClientAgreement = (req, res, next) => {
 
     if (errors) {
         req.flash('errors', errors);
-        return res.redirect('/client-form');
+        return res.redirect('/client/form');
     }
 };
 
@@ -48,7 +48,7 @@ exports.postClientAgreement = (req, res, next) => {
  * Client Submission page.
  */
 exports.getClientForm = (req, res) => {
-    res.render('clientForm', {
+    res.render('client/clientForm', {
         title: 'Client Submission Form'
     });
 };
@@ -61,7 +61,7 @@ exports.getClientTime = (req, res) => {
     Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
         // console.log(Clients);
         if (err) return handleError(err);
-        res.render('clientTimes', {
+        res.render('client/clientTimes', {
             title: 'Time Selection',
             clients: Clients
         });
@@ -86,12 +86,20 @@ exports.postClientForm = (req, res, next) => {
 
   const client = new Client({
     email: req.body.email,
+    organization: req.body.organization,
     project: req.body.project,
+    presentation: req.body.presentation,
     description: req.body.description,
     name: req.body.name,
     term: req.body.term,
     isDecided: false,
-    isApproved: false
+    isApproved: false,
+    status: 'Pending',
+    isDeleted: false,
+    sentApproval: false,
+    sentDenial: false,
+    sentDeletion: false,
+    sentPitchSchedule: false
   });
 
   client.save((err) => {
