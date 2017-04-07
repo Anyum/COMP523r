@@ -56,7 +56,7 @@ $(document).ready(function() {
         for (recipient of recipients) {
             html += "" +
             "<tr>" +
-            "<th><div class=\"checkbox\"><label><input type=\"checkbox\" value=\"" + recipient.id +"\"></label></div></th>" +
+            "<th><div class=\"checkbox\"><label><input type=\"checkbox\" value=\"" + recipient._id +"\"></label></div></th>" +
             "<th>" + recipient.name + "\n" +
             "<th>" + recipient.project + "</th>";
             if (recipient.sentApproval) {
