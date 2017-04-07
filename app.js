@@ -180,7 +180,9 @@ app.get('/client/client-times', clientController.getClientTime);
  * Student routes
  */
 app.get('/student', studentController.getStudentForm);
+app.post('/student', studentController.postStudentForm);
 app.get('/student/resources', studentController.getStudentResources);
+app.get('/successfulSubmission', studentController.getSubmissionSuccess);
 
 /**
  * Error Handler.
