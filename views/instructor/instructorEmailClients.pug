@@ -23,7 +23,7 @@ block content
         .container
             .row
                 #section1
-                    h1 Choose what group you are sending to!
+                    h1 1: Choose what group you are sending to!
                     p Send an email to:
                     button.pending.btn.btn-primary.btn-sm(type='button') Pending Clients
                     button.approved.btn.btn-success.btn-sm(type='button') Approved Clients
@@ -31,12 +31,12 @@ block content
                     button.deleted.btn.btn-danger.btn-sm(type='button') Deleted Clients
             .row
                 #section2
-                    h1 Refine client selection
+                    h1 2: Refine client selection
                     #clientSelection
                         p Choose a group to send an email to, then this box will allow you to refine your search
             .row
                 #section3
-                    h1 Customize your message
+                    h1 3: Customize your message
                     form.form-horizontal(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         .form-group
