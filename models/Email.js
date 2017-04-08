@@ -7,6 +7,6 @@ const emailTemplateSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-const Email = mongoose.model('Client', emailTemplateSchema);
+const Email = mongoose.model('Email', emailTemplateSchema);
 
 module.exports = Email;

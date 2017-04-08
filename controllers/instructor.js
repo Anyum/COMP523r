@@ -1,4 +1,5 @@
 const Client = require('../models/Client');
+const Email = require('../models/Email');
 const async = require('async');
 const nodemailer = require('nodemailer');
 
@@ -256,5 +257,69 @@ exports.getDeletedJSON = (req, res) => {
     Client.find({isDeleted: true}, (err, Clients) => {
         if (err) return handleError(err);
         res.send(Clients);
+    });
+};
+
+/**
+ * GET /instructor/add-template
+ * A form to add an email template
+ */
+exports.getAddTemplate = (req, res) => {
+    res.render('instructor/addTemplate',{
+        title: 'Add an email template'
+    });
+};
+/**
+ * POST /instructor/add-template
+ * Add the template to the database
+ */
+exports.postAddTemplate = (req, res) => {
+    const email = new Email({
+        description: req.body.description,
+        subject: req.body.subject,
+        body: req.body.body,
+    });
+
+    email.save((err) => {
+        if (err) { throw err; }
+        else res.redirect('/instructor');
+    });
+};
+/**
+ * GET /instructor/modify-templates
+ * Allows you to change or delete templates
+ */
+exports.getModifyTemplates = (req, res) => {
+    Email.find({}, (err, templates) => {
+        if (err) return handleError(err);
+        res.render('instructor/modifyTemplates', {
+            title: 'Modify an existing template',
+            templates: templates
+        });
+    });
+};
+/**
+ * POST /instructor/modify-templates
+ * Change templates or delete them
+ */
+exports.postModifyTemplates= (req, res) => {
+    var decision = req.body.modify_button;
+    var templateID = req.body.templateID;
+    console.log('Recieved request for ' + templateID);
+    console.log('Decision is: ' + req.body.modify_button);
+    // Find the client that the instructor approved/denied. Process CRUD.
+    Email.findOne({_id: templateID}, (err, template) => {
+        if (err) return handleError(err);
+        if (decision == 'Update') {
+            template.description = req.body.description;
+            template.subject = req.body.subject;
+            template.body = req.body.body;
+            template.save(function (err, template) {
+                if (err) { return res.status(500).send(err); }
+                else return res.redirect('back');
+            });
+        } else if (decision == 'Delete') {
+            template.remove().then(res.redirect('back'));
+        }
     });
 };

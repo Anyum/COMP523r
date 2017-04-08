@@ -37,12 +37,18 @@ block content
             .row
                 #section3
                     h1 3: Customize your message
+                    p First, choose an email template (you must complete this step):
+                    #emailTemplates
                     form.form-horizontal(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         .form-group
-                            label(class='col-sm-2 control-label', for='name') To
+                            label(class='col-sm-2 control-label', for='to') To
                             .col-sm-8
-                                input.form-control(type='text', name='name', id='name')
+                                input.form-control(type='text', name='to', id='to')
+                        .form-group
+                            label(class='col-sm-2 control-label', for='subject') Subject
+                            .col-sm-8
+                                input.form-control(type='text', name='subject', id='subject')
                         .form-group
                             label(class='col-sm-2 control-label', for='message') Body
                             .col-sm-8

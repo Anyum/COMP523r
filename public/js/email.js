@@ -1,10 +1,23 @@
-//TODO: We are getting JSON in on button press. Write a function to display it.
+function createTemplateButtons(templates){
+    var html;
+    for (template of templates) {
+        html += "<button class=\"" + template.description + "btn btn-primary btn-sm\" type=\"button\">Pending Clients</button>"
+    }
+    return html;
+}
 
 $(document).ready(function() {
     var recipients;
     var clientType;
 
     $('#breadcrumb').append(createBreadcrumb());
+
+    $.get('/api/emailTemplates').then(function(JSON) {
+        recipients = JSON;
+        clientType = "approved";
+        $('#emailTemplates').empty();
+        $('#emailTemplates').append(createTemplateButtons(JSON));
+    });
 
     $(".pending").on("click", function(){
         $.get('/api/pendingProjects').then(function(JSON) {
@@ -38,6 +51,24 @@ $(document).ready(function() {
             $('#clientSelection').append(getClientHTML());
         });
     })
+
+    $("#formoid").submit(function(event) {
+
+        /* stop form from submitting normally */
+        event.preventDefault();
+
+        /* get the action attribute from the <form action=""> element */
+        var $form = $( this ),
+            url = $form.attr( 'action' );
+
+        /* Send the data using post with element id name and name2*/
+        var posting = $.post( url, { name: $('#name').val(), name2: $('#name2').val() } );
+
+        /* Alerts the results */
+        posting.done(function( data ) {
+            alert('success');
+        });
+    });
 
     function getClientHTML() {
         var html = "" +
@@ -83,11 +114,4 @@ $(document).ready(function() {
         }
         return html
     };
-    /*
-    sentApproval: false,
-    sentDenial: false,
-    sentDeletion: false,
-    sentPitchSchedule: false
-    */
-
 });
