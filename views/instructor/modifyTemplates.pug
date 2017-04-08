@@ -22,6 +22,7 @@ block content
                         .row
                             input(type='hidden', name='_csrf', value=_csrf)
                             input(type='hidden', name='templateID', value= template._id)
+                            input(type='hidden', name='description', value= template.description)
                             .col-xs-6
                                     button.btn.btn-success.btn-sm.pull-left(type='submit', name="modify_button", value='Update') Update Template
                             .col-xs-6

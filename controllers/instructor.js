@@ -261,6 +261,17 @@ exports.getDeletedJSON = (req, res) => {
 };
 
 /**
+ * GET all email templates
+ * returned in JSON format
+ */
+exports.getEmailTemplates = (req, res) => {
+    Email.find({}, (err, Templates) => {
+        if (err) return handleError(err);
+        res.send(Templates);
+    });
+};
+
+/**
  * GET /instructor/add-template
  * A form to add an email template
  */

@@ -172,7 +172,7 @@ app.get('/api/approvedProjects',passportConfig.isAuthenticated,passportConfig.is
 app.get('/api/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingJSON);
 app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedJSON);
 app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
-app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
+app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailTemplates);
 
 /**
  * Client routes

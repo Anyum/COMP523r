@@ -1,57 +1,109 @@
+//TODO: Make onSubmit function to pass al relevant data to model function
 function createTemplateButtons(templates){
-    var html;
+    var html = "<span>";
     for (template of templates) {
-        html += "<button class=\"" + template.description + "btn btn-primary btn-sm\" type=\"button\">Pending Clients</button>"
+        html += "<button id=\"" + template._id + "\" class=\"button-template btn btn-primary btn-sm\" type=\"button\">" + template.description + "</button>"
     }
+    html += "</span>"
     return html;
 }
 
 $(document).ready(function() {
-    var recipients;
+    //allRecipients is determined in step 1 based on category chosen
+    var allRecipients;
     var clientType;
+    var templates;
+    //finalRecipients are the recipients selected in step 2
+    var finalRecipients = [];
+    var finalSubject;
+    var finalBody;
 
     $('#breadcrumb').append(createBreadcrumb());
 
     $.get('/api/emailTemplates').then(function(JSON) {
-        recipients = JSON;
-        clientType = "approved";
+        templates = JSON;
         $('#emailTemplates').empty();
-        $('#emailTemplates').append(createTemplateButtons(JSON));
+        $('#emailTemplates').append(createTemplateButtons(templates));
     });
 
     $(".pending").on("click", function(){
         $.get('/api/pendingProjects').then(function(JSON) {
-            recipients = JSON;
+            allRecipients = JSON;
+            finalRecipients = [];
             clientType = "pending";
             $('#clientSelection').empty();
             $('#clientSelection').append(getClientHTML());
         });
-    })
+    });
     $(".approved").on("click", function(){
         $.get('/api/approvedProjects').then(function(JSON) {
-            recipients = JSON;
+            allRecipients = JSON;
+            finalRecipients = [];
             clientType = "approved";
             $('#clientSelection').empty();
             $('#clientSelection').append(getClientHTML());
         });
-    })
+    });
     $(".rejected").on("click", function(){
         $.get('/api/rejectedProjects').then(function(JSON) {
-            recipients = JSON;
+            allRecipients = JSON;
+            finalRecipients = [];
             clientType = "rejected";
             $('#clientSelection').empty();
             $('#clientSelection').append(getClientHTML());
         });
-    })
+    });
     $(".deleted").on("click", function(){
         $.get('/api/deletedProjects').then(function(JSON) {
-            recipients = JSON;
+            allRecipients = JSON;
+            finalRecipients = [];
             clientType = "deleted";
             $('#clientSelection').empty();
             $('#clientSelection').append(getClientHTML());
         });
-    })
+    });
 
+    //add clients to finalRecipients on click
+    $("#clientSelection").on('click', '.checkbox', function(){
+        var id = this.id;
+        for (var i = 0; i < allRecipients.length; i++) {
+            if (id == allRecipients[i]._id) {
+                if ($(this).is(':checked')) {
+                    finalRecipients.push(allRecipients[i]);
+                } else {
+                    for (var j = finalRecipients.length - 1; j>=0; j--) {
+                        if (id == finalRecipients[j]._id) {
+                            finalRecipients.splice(i,1);
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
+        }
+    });
+    //fill out the template form and get all final data in the right place
+    $("#emailTemplates").on('click', '.button-template', function(){
+        var id = this.id;
+        var recipientTo = "";
+        for (recipient of finalRecipients) {
+            recipientTo += recipient.name + ", ";
+        }
+        $("#to").val(recipientTo);
+        for (template of templates) {
+            if (id == template._id) {
+                $("#subject").val(template.subject);
+                $("#message").val(template.body);
+                for (recipient of allRecipients) {
+
+                }
+                finalSubject = template.subject;
+                finalBody = template.body;
+                return;
+            }
+        }
+    });
+    //TODO: remove if unnecessary
     $("#formoid").submit(function(event) {
 
         /* stop form from submitting normally */
@@ -84,10 +136,10 @@ $(document).ready(function() {
             "<th>sentDeletion</th>" +
             "<th>sentSchedule</th>" +
             "<tbody>";
-        for (recipient of recipients) {
+        for (recipient of allRecipients) {
             html += "" +
             "<tr>" +
-            "<th><div class=\"checkbox\"><label><input type=\"checkbox\" value=\"" + recipient._id +"\"></label></div></th>" +
+            "<th><input class=\"checkbox\" type=\"checkbox\" id=\"" + recipient._id +"\" value=\"" + recipient._id +"\"></th>" +
             "<th>" + recipient.name + "\n" +
             "<th>" + recipient.project + "</th>";
             if (recipient.sentApproval) {
