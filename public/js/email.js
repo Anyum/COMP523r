@@ -1,4 +1,3 @@
-//TODO: Make onSubmit function to pass al relevant data to model function
 function createTemplateButtons(templates){
     var html = "<span>";
     for (template of templates) {
@@ -14,6 +13,7 @@ $(document).ready(function() {
     var clientType;
     var templates;
     //finalRecipients are the recipients selected in step 2
+    var senderName = "";
     var finalRecipients = [];
     var finalSubject;
     var finalBody;
@@ -102,24 +102,6 @@ $(document).ready(function() {
                 return;
             }
         }
-    });
-    //TODO: remove if unnecessary
-    $("#formoid").submit(function(event) {
-
-        /* stop form from submitting normally */
-        event.preventDefault();
-
-        /* get the action attribute from the <form action=""> element */
-        var $form = $( this ),
-            url = $form.attr( 'action' );
-
-        /* Send the data using post with element id name and name2*/
-        var posting = $.post( url, { name: $('#name').val(), name2: $('#name2').val() } );
-
-        /* Alerts the results */
-        posting.done(function( data ) {
-            alert('success');
-        });
     });
 
     function getClientHTML() {
