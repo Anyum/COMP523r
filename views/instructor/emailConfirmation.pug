@@ -1,0 +1,76 @@
+extends ../layout
+block extraHeader
+    script(src='/js/emailConfirmation.js')
+    style.
+        .btn span.glyphicon {
+            opacity: 0;
+            padding-right: 10px;
+        }
+
+        .btn.active span.glyphicon {
+            opacity: 1;
+        }
+block content
+    #breadcrumb
+    script.
+        var subject = "#{subject}";
+        var recipients = !{JSON.stringify(recipients)};
+        var body = !{JSON.stringify(body)};
+        var senderName = "#{senderName}";
+    .btn-group(data-toggle='buttons')
+        label.btn.btn-success.active
+            input(type='checkbox', autocomplete='off')
+            |
+            span.glyphicon.glyphicon-ok
+            span Approval
+        |
+        label.btn.btn-warning
+            input(type='checkbox', autocomplete='off')
+            |
+            span.glyphicon.glyphicon-ok
+            span Denial
+        |
+        label.btn.btn-danger
+            input(type='checkbox', autocomplete='off')
+            |
+            span.glyphicon.glyphicon-ok
+            span Deletion
+        |
+        label.btn.btn-info
+            input(type='checkbox', autocomplete='off')
+            |
+            span.glyphicon.glyphicon-ok
+            span Scheduling
+    if recipients
+        each recipient in recipients
+            .panel.panel-default
+                .panel-heading
+                    h4 #{recipient.name} - #{recipient.project}
+                .li.list-group-item
+                    strong From:
+                    |  #{senderName}
+                .li.list-group-item
+                    strong To:
+                    |  #{recipient.email}
+                .li.list-group-item
+                    strong Subject:
+                    |  #{subject}
+                .li.list-group-item
+                    strong Body:
+                    .body
+                .panel-footer
+                    a.pull-right.mailTo(id=recipient._id, href='#') mailTo link.
+                    strong INFO: Client submitted for term:
+                    |  #{recipient.term}
+    .row.col-xs-12
+        a.btn.btn-danger.btn-sm.pull-left(href='/instructor/email-clients', role='button') Go back
+        form(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            input(type='hidden', name='Decision', value= 'Deny')
+            button.btn.btn-success.btn-sm.pull-right(type='submit', value='Deny') Automatically send emails
+        form(method='POST')
+            input(type='hidden', name='_csrf', value=_csrf)
+            input(type='hidden', name='Decision', value= 'Delete')
+            button.btn.btn-info.btn-sm.pull-right(type='submit', value='Delete') Sent with mailto links
+
+

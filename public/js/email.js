@@ -3,7 +3,7 @@ function createTemplateButtons(templates){
     for (template of templates) {
         html += "<button id=\"" + template._id + "\" class=\"button-template btn btn-primary btn-sm\" type=\"button\">" + template.description + "</button>"
     }
-    html += "</span>"
+    html += "</span>";
     return html;
 }
 
@@ -94,14 +94,21 @@ $(document).ready(function() {
             if (id == template._id) {
                 $("#subject").val(template.subject);
                 $("#message").val(template.body);
-                for (recipient of allRecipients) {
-
-                }
                 finalSubject = template.subject;
                 finalBody = template.body;
                 return;
             }
         }
+    });
+
+    $("#email-form").submit(function(event) {
+        finalSubject = $("#subject").val();
+        finalBody = $("#message").val();
+        senderName = $("#name").val();
+        var json = JSON.stringify({finalRecipients: finalRecipients, finalSubject: finalSubject, finalBody: finalBody, senderName: senderName});
+        $(this).append('<input type="hidden" id="hiddenData" name="data">');
+        $("#hiddenData").val(json);
+        return true;
     });
 
     function getClientHTML() {

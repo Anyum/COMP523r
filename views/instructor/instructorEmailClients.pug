@@ -39,10 +39,11 @@ block content
             p First, choose an email template (you must complete this step):
             #emailTemplates
             br
-            form.form-horizontal(method='POST')
+            form.form-horizontal(method='POST' id='email-form')
                 input(type='hidden', name='_csrf', value=_csrf)
+                input(type='hidden', name='data', value=[])
                 .form-group
-                    label(class='col-sm-2 control-label', for='name') Sender's Name
+                    label(class='col-sm-2 control-label', for='name', autofocus=true) Sender's Name
                     .col-sm-8
                         input.form-control(type='text', name='name', id='name')
                 .form-group
@@ -56,9 +57,9 @@ block content
                 .form-group
                     label(class='col-sm-2 control-label', for='message') Body
                     .col-sm-8
-                        textarea.form-control(name='message', id='message', rows='7', autofocus=true)
+                        textarea.form-control(name='message', id='message', rows='7')
                 .form-group
                     .col-sm-offset-2.col-sm-8
-                        button.btn.btn-primary(type='submit')
+                        button.btn.btn-primary(type='submit', id='submit')
                             i.fa.fa-envelope
                             | Click here to finalize sending your messages

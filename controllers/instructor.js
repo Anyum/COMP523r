@@ -188,17 +188,21 @@ exports.getEmailClients = (req, res) => {
  * Send an email via Nodemailer.
  */
 exports.postEmailClients = (req, res) => {
-    req.assert('name', 'Name cannot be blank').notEmpty();
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('message', 'Message cannot be blank').notEmpty();
+    var emailData = JSON.parse(req.body.data[1]);
+    res.render('instructor/emailConfirmation',{
+        title: 'Finalize your email',
+        recipients: emailData.finalRecipients,
+        subject: emailData.finalSubject,
+        body: emailData.finalBody,
+        senderName: emailData.senderName
+    });
+};
 
-    const errors = req.validationErrors();
-
-    if (errors) {
-        req.flash('errors', errors);
-        return res.redirect('/contact');
-    }
-
+/**
+ * POST /instructor/email-confirmation
+ * Send an email via Nodemailer.
+ */
+exports.postEmailConfirmation = (req, res) => {
     // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
     const mailOptions = {
         to: 'your@email.com',
