@@ -4,10 +4,14 @@ const async = require('async');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASSWORD
+        type: 'OAuth2',
+        user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
+        clientId: process.env.GMAIL_CLIENT_ID || '102432029371-k5r65rmg8fe144oeh5o1pb5mch88eaqm.apps.googleusercontent.com',
+        clientSecret: process.env.GMAIL_CLIENT_SECRET || 'c0Qg6aZjcw9Wns7vE7UViIeB',
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/GuES49HKaJud_cXINNZcJJBx4QOQWprPIzWcRSFEQJo',
+        accessToken: process.env.GMAIL_ACCESS_TOKEN || 'ya29.GlsuBKxAvrF21iT5JTWOxlazjxvPE9pZy2GbUlpcGYKkywJPCcOfrAbCWVPem2uta5YWqpORp5rNesY8J_U3b3BmAL-T_84X_9WjFBQ_aBiTlDGtJg1-xElID-lI'
     }
 });
 
@@ -203,22 +207,66 @@ exports.postEmailClients = (req, res) => {
  * Send an email via Nodemailer.
  */
 exports.postEmailConfirmation = (req, res) => {
-    // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
-    const mailOptions = {
-        to: 'your@email.com',
-        from: `${req.body.name} <${req.body.email}>`,
-        subject: 'Contact Form | Hackathon Starter',
-        text: req.body.message
-    };
+    var emailData = JSON.parse(req.body.data);
+    var recipients = emailData.finalRecipients;
+    var subject = emailData.finalSubject;
+    var body = emailData.finalBody;
+    var senderName = emailData.senderName;
+    //emailCategory structure: {Approve: false, Deny: false, Delete: false, Schedule: true}
+    var emailCategory = emailData.emailCategory;
+    var decision = req.body.Decision;
 
-    transporter.sendMail(mailOptions, (err) => {
-        if (err) {
-            req.flash('errors', { msg: err.message });
-            return res.redirect('/contact');
-        }
-        req.flash('success', { msg: 'Email has been sent successfully!' });
-        res.redirect('/contact');
-    });
+    // Find the client that the instructor approved/denied. Process CRUD.
+    for (recipient of recipients) {
+        Client.findOne({_id: recipient._id}, (err, client) => {
+            if (err) return handleError(err);
+            if (decision == 'Manual') {
+                if (emailCategory.Approve == true) {client.sentApproval = true;}
+                if (emailCategory.Deny == true) {client.sentDenial = true;}
+                if (emailCategory.Delete == true) {client.sentDeletion = true;}
+                if (emailCategory.Schedule == true) {client.sentPitchSchedule = true;}
+                client.save(function (err, client) {
+                    if (err) { return res.status(500).send(err); }
+                });
+            } else if (decision == 'Automatic') {
+                //Send email
+                // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
+                var mailOptions = {
+                    to: `${client.name} <${client.email}>`,
+                    from: `${senderName} <${transporter._options.auth.user}>`,
+                    subject: subject,
+                    text: body
+                };
+                // verify connection configuration
+                transporter.verify(function(error, success) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Server is ready to take our messages');
+                    }
+                });
+                transporter.sendMail(mailOptions, (err, response) => {
+                    if (err) {
+                        req.flash('errors', { msg: err.message });
+                        console.log(err);
+                    }else{
+                        req.flash('success', { msg: 'Email has been sent successfully!' });
+                        console.log("Message sent: " + response.message);
+                    }
+                    transporter.close();
+                });
+
+                if (emailCategory.Approve == true) {client.sentApproval = true;}
+                if (emailCategory.Deny == true) {client.sentDenial = true;}
+                if (emailCategory.Delete == true) {client.sentDeletion = true;}
+                if (emailCategory.Schedule == true) {client.sentPitchSchedule = true;}
+                client.save(function (err, client) {
+                    if (err) { return res.status(500).send(err); }
+                });
+            };
+        });
+    }
+    return res.redirect('/instructor/email-clients');
 };
 
 //The following three GET requests for JSON of all client types

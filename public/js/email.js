@@ -132,22 +132,22 @@ $(document).ready(function() {
             "<th>" + recipient.name + "\n" +
             "<th>" + recipient.project + "</th>";
             if (recipient.sentApproval) {
-                html += "<th></th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
+                html += "<th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
             } else {
                 html += "<th><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></th>";
             };
             if (recipient.sentDenial) {
-                html += "<th></th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
+                html += "<th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
             } else {
                 html += "<th><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></th>";
             };
             if (recipient.sentDeletion) {
-                html += "<th></th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
+                html += "<th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
             } else {
                 html += "<th><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></th>";
             };
             if (recipient.sentPitchSchedule) {
-                html += "<th></th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
+                html += "<th><span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span></th>";
             } else {
                 html += "<th><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></th>";
             };
