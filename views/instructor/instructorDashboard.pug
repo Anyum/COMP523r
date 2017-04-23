@@ -6,17 +6,20 @@ block content
     hr
     .row
             h2 Manage Client Requests
-            p
+            p(style='white-space:pre;')
                 //if pendingClientRequests
-                | You have
-                strong  #{approvedClientRequests}
-                |  approved client requests
                 | You have
                 strong  #{pendingClientRequests}
                 |  pending client requests
                 | You have
+                strong  #{approvedClientRequests}
+                |  approved client requests
+                | You have
                 strong  #{rejectedClientRequests}
                 |  rejected client requests
+                | You have
+                strong  #{deletedClientRequests}
+                |  deleted client requests
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
     hr

@@ -183,6 +183,7 @@ app.get('/client/agreement', clientController.getClientAgreement);
 app.get('/client/form', clientController.getClientForm);
 app.post('/client/form', clientController.postClientForm);
 app.get('/client/client-times', clientController.getClientTime);
+app.get('/client/submission-successful', clientController.getClientFormSubmitted)
 
 /**
  * Student routes

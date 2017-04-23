@@ -27,7 +27,7 @@ exports.getDashboard = (req, res) => {
     async.parallel([
         // Undecided client proposals
         function(callback) {
-            Client.count({isDecided: false}, (err, count) => {
+            Client.count({isDecided: false, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.undecided = count;
                 callback();
@@ -35,7 +35,7 @@ exports.getDashboard = (req, res) => {
         },
         // Rejected client proposals
         function(callback) {
-            Client.count({isDecided: true, isApproved: false}, (err, count) => {
+            Client.count({isDecided: true, isApproved: false, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.rejected = count;
                 callback();
@@ -43,9 +43,17 @@ exports.getDashboard = (req, res) => {
         },
         // Approved client proposals
         function(callback) {
-            Client.count({isDecided: true, isApproved: true}, (err, count) => {
+            Client.count({isDecided: true, isApproved: true, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.approved = count;
+                callback();
+            });
+        },
+        // Deleted client proposals
+        function(callback) {
+            Client.count({isDeleted: true}, (err, count) => {
+                if (err) return callback(err);
+                locals.deleted = count;
                 callback();
             });
         }
@@ -56,7 +64,8 @@ exports.getDashboard = (req, res) => {
             title: 'Instructor Dashboard',
             pendingClientRequests: locals.undecided,
             rejectedClientRequests: locals.rejected,
-            approvedClientRequests: locals.approved
+            approvedClientRequests: locals.approved,
+            deletedClientRequests: locals.deleted
         });
     });
 };

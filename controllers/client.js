@@ -52,7 +52,15 @@ exports.getClientForm = (req, res) => {
         title: 'Client Submission Form'
     });
 };
-
+/**
+ * GET /submission-successful
+ * Confirmation that client form was submitted successfully
+ */
+exports.getClientFormSubmitted = (req, res) => {
+    res.render('client/clientFormSubmitted', {
+        title: 'Project Proposal Submitted Successfully'
+    });
+};
 /**
  * GET /client-times
  * Filling out preferred time slots
@@ -81,7 +89,7 @@ exports.postClientForm = (req, res, next) => {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('/client-form');
+    return res.redirect('client/clientForm');
   }
 
   const client = new Client({
@@ -104,6 +112,21 @@ exports.postClientForm = (req, res, next) => {
 
   client.save((err) => {
       if (err) { throw err; }
-      else res.redirect('/submission-successful');
+      else {
+          var test1 = "hi";
+          var test2 = "hi 2";
+          var test3 = "hi 3"
+      //    req.session.valid = true;
+          // res.redirect('/client/submission-successful');
+          res.render('client/clientFormSubmitted', {
+              email: req.body.email,
+              organization: req.body.organization,
+              project: req.body.project,
+              presentation: req.body.presentation,
+              description: req.body.description,
+              name: req.body.name,
+              term: req.body.term,
+          });
+      }
   });
 };
