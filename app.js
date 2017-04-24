@@ -175,6 +175,12 @@ app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.is
 app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
 app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailTemplates);
 
+// Student team stuff
+app.get('/instructor/view-student-submitted-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getSubmittedTeams);
+app.get('/instructor/generate-final-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getGeneratedTeams);
+app.get('/instructor/compute-team-mapping-to-projects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getTeamMappingToProjects);
+
+
 /**
  * Client routes
  */

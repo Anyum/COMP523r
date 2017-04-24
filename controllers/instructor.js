@@ -2,6 +2,7 @@ const Client = require('../models/Client');
 const Email = require('../models/Email');
 const async = require('async');
 const nodemailer = require('nodemailer');
+const Students = require('../models/Student');
 
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -394,4 +395,45 @@ exports.postModifyTemplates= (req, res) => {
             template.remove().then(res.redirect('back'));
         }
     });
+};
+/**
+ * GET /instructor/view-student-submitted-teams
+ * Allows you to view-student-submitted-teams
+ */
+exports.getSubmittedTeams = (req, res) => {
+    Students.find({}, (err, Students) => {
+        if (err) return handleError(err);
+    res.render('instructor/viewStudentSubmittedTeams', {
+        title: 'Student Submitted Teams',
+        studentTeams: Students
+    });
+});
+};
+/**
+ * GET /instructor/generate-final-teams
+ * Allows you to generate-final-teams
+ */
+exports.getGeneratedTeams = (req, res) => {
+    Students.find({}, (err, Students) => {
+        if (err) return handleError(err);
+    res.render('instructor/generatedTeams', {
+        title: 'Generated Teams of 4',
+        studentTeams: Students
+    });
+});
+};
+
+/**
+ * GET /instructor/compute-team-mapping-to-projects
+ * Allows you to compute-team-mapping-to-projects
+ */
+exports.getTeamMappingToProjects = (req, res) => {
+    Students.find({}, (err, Students) => {
+        if (err) return handleError(err);
+    res.render('instructor/teamMappingToProjects', {
+        title: 'Team Mapping To Projects',
+        studentTeams: Students,
+        projects: [1,2,3,4,5,6,7,8,9,10,11,12]
+    });
+});
 };
