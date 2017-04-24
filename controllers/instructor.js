@@ -1,12 +1,17 @@
 const Client = require('../models/Client');
+const Email = require('../models/Email');
 const async = require('async');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASSWORD
+        type: 'OAuth2',
+        user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
+        clientId: process.env.GMAIL_CLIENT_ID || '102432029371-k5r65rmg8fe144oeh5o1pb5mch88eaqm.apps.googleusercontent.com',
+        clientSecret: process.env.GMAIL_CLIENT_SECRET || 'c0Qg6aZjcw9Wns7vE7UViIeB',
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/GuES49HKaJud_cXINNZcJJBx4QOQWprPIzWcRSFEQJo',
+        accessToken: process.env.GMAIL_ACCESS_TOKEN || 'ya29.GlsuBKxAvrF21iT5JTWOxlazjxvPE9pZy2GbUlpcGYKkywJPCcOfrAbCWVPem2uta5YWqpORp5rNesY8J_U3b3BmAL-T_84X_9WjFBQ_aBiTlDGtJg1-xElID-lI'
     }
 });
 
@@ -22,7 +27,7 @@ exports.getDashboard = (req, res) => {
     async.parallel([
         // Undecided client proposals
         function(callback) {
-            Client.count({isDecided: false}, (err, count) => {
+            Client.count({isDecided: false, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.undecided = count;
                 callback();
@@ -30,7 +35,7 @@ exports.getDashboard = (req, res) => {
         },
         // Rejected client proposals
         function(callback) {
-            Client.count({isDecided: true, isApproved: false}, (err, count) => {
+            Client.count({isDecided: true, isApproved: false, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.rejected = count;
                 callback();
@@ -38,9 +43,17 @@ exports.getDashboard = (req, res) => {
         },
         // Approved client proposals
         function(callback) {
-            Client.count({isDecided: true, isApproved: true}, (err, count) => {
+            Client.count({isDecided: true, isApproved: true, isDeleted: false}, (err, count) => {
                 if (err) return callback(err);
                 locals.approved = count;
+                callback();
+            });
+        },
+        // Deleted client proposals
+        function(callback) {
+            Client.count({isDeleted: true}, (err, count) => {
+                if (err) return callback(err);
+                locals.deleted = count;
                 callback();
             });
         }
@@ -51,7 +64,8 @@ exports.getDashboard = (req, res) => {
             title: 'Instructor Dashboard',
             pendingClientRequests: locals.undecided,
             rejectedClientRequests: locals.rejected,
-            approvedClientRequests: locals.approved
+            approvedClientRequests: locals.approved,
+            deletedClientRequests: locals.deleted
         });
     });
 };
@@ -187,33 +201,81 @@ exports.getEmailClients = (req, res) => {
  * Send an email via Nodemailer.
  */
 exports.postEmailClients = (req, res) => {
-    req.assert('name', 'Name cannot be blank').notEmpty();
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('message', 'Message cannot be blank').notEmpty();
-
-    const errors = req.validationErrors();
-
-    if (errors) {
-        req.flash('errors', errors);
-        return res.redirect('/contact');
-    }
-
-    // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
-    const mailOptions = {
-        to: 'your@email.com',
-        from: `${req.body.name} <${req.body.email}>`,
-        subject: 'Contact Form | Hackathon Starter',
-        text: req.body.message
-    };
-
-    transporter.sendMail(mailOptions, (err) => {
-        if (err) {
-            req.flash('errors', { msg: err.message });
-            return res.redirect('/contact');
-        }
-        req.flash('success', { msg: 'Email has been sent successfully!' });
-        res.redirect('/contact');
+    var emailData = JSON.parse(req.body.data[1]);
+    res.render('instructor/emailConfirmation',{
+        title: 'Finalize your email',
+        recipients: emailData.finalRecipients,
+        subject: emailData.finalSubject,
+        body: emailData.finalBody,
+        senderName: emailData.senderName
     });
+};
+
+/**
+ * POST /instructor/email-confirmation
+ * Send an email via Nodemailer.
+ */
+exports.postEmailConfirmation = (req, res) => {
+    var emailData = JSON.parse(req.body.data);
+    var recipients = emailData.finalRecipients;
+    var subject = emailData.finalSubject;
+    var body = emailData.finalBody;
+    var senderName = emailData.senderName;
+    //emailCategory structure: {Approve: false, Deny: false, Delete: false, Schedule: true}
+    var emailCategory = emailData.emailCategory;
+    var decision = req.body.Decision;
+
+    // Find the client that the instructor approved/denied. Process CRUD.
+    for (recipient of recipients) {
+        Client.findOne({_id: recipient._id}, (err, client) => {
+            if (err) return handleError(err);
+            if (decision == 'Manual') {
+                if (emailCategory.Approve == true) {client.sentApproval = true;}
+                if (emailCategory.Deny == true) {client.sentDenial = true;}
+                if (emailCategory.Delete == true) {client.sentDeletion = true;}
+                if (emailCategory.Schedule == true) {client.sentPitchSchedule = true;}
+                client.save(function (err, client) {
+                    if (err) { return res.status(500).send(err); }
+                });
+            } else if (decision == 'Automatic') {
+                //Send email
+                // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
+                var mailOptions = {
+                    to: `${client.name} <${client.email}>`,
+                    from: `${senderName} <${transporter._options.auth.user}>`,
+                    subject: subject,
+                    text: body
+                };
+                // verify connection configuration
+                transporter.verify(function(error, success) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Server is ready to take our messages');
+                    }
+                });
+                transporter.sendMail(mailOptions, (err, response) => {
+                    if (err) {
+                        req.flash('errors', { msg: err.message });
+                        console.log(err);
+                    }else{
+                        req.flash('success', { msg: 'Email has been sent successfully!' });
+                        console.log("Message sent: " + response.message);
+                    }
+                    transporter.close();
+                });
+
+                if (emailCategory.Approve == true) {client.sentApproval = true;}
+                if (emailCategory.Deny == true) {client.sentDenial = true;}
+                if (emailCategory.Delete == true) {client.sentDeletion = true;}
+                if (emailCategory.Schedule == true) {client.sentPitchSchedule = true;}
+                client.save(function (err, client) {
+                    if (err) { return res.status(500).send(err); }
+                });
+            };
+        });
+    }
+    return res.redirect('/instructor/email-clients');
 };
 
 //The following three GET requests for JSON of all client types
@@ -256,5 +318,80 @@ exports.getDeletedJSON = (req, res) => {
     Client.find({isDeleted: true}, (err, Clients) => {
         if (err) return handleError(err);
         res.send(Clients);
+    });
+};
+
+/**
+ * GET all email templates
+ * returned in JSON format
+ */
+exports.getEmailTemplates = (req, res) => {
+    Email.find({}, (err, Templates) => {
+        if (err) return handleError(err);
+        res.send(Templates);
+    });
+};
+
+/**
+ * GET /instructor/add-template
+ * A form to add an email template
+ */
+exports.getAddTemplate = (req, res) => {
+    res.render('instructor/addTemplate',{
+        title: 'Add an email template'
+    });
+};
+/**
+ * POST /instructor/add-template
+ * Add the template to the database
+ */
+exports.postAddTemplate = (req, res) => {
+    const email = new Email({
+        description: req.body.description,
+        subject: req.body.subject,
+        body: req.body.body,
+    });
+
+    email.save((err) => {
+        if (err) { throw err; }
+        else res.redirect('/instructor');
+    });
+};
+/**
+ * GET /instructor/modify-templates
+ * Allows you to change or delete templates
+ */
+exports.getModifyTemplates = (req, res) => {
+    Email.find({}, (err, templates) => {
+        if (err) return handleError(err);
+        res.render('instructor/modifyTemplates', {
+            title: 'Modify an existing template',
+            templates: templates
+        });
+    });
+};
+/**
+ * POST /instructor/modify-templates
+ * Change templates or delete them
+ */
+exports.postModifyTemplates= (req, res) => {
+    var decision = req.body.modify_button;
+    var templateID = req.body.templateID;
+    console.log('Recieved request for ' + templateID);
+    console.log('Decision is: ' + req.body.modify_button);
+    // Find the client that the instructor approved/denied. Process CRUD.
+    Email.findOne({_id: templateID}, (err, template) => {
+        if (err) return handleError(err);
+        if (decision == 'Update') {
+            template.description = req.body.description;
+            template.subject = req.body.subject;
+            template.body = req.body.body;
+            template.save(function (err, template) {
+                if (err) { return res.status(500).send(err); }
+                else return res.redirect('back');
+            });
+        } else if (decision == 'Delete') {
+            template.remove().then(res.redirect('back'));
+        }
     });
 };

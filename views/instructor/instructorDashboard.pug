@@ -6,17 +6,20 @@ block content
     hr
     .row
             h2 Manage Client Requests
-            p
+            p(style='white-space:pre;')
                 //if pendingClientRequests
-                | You have
-                strong  #{approvedClientRequests}
-                |  approved client requests
                 | You have
                 strong  #{pendingClientRequests}
                 |  pending client requests
                 | You have
+                strong  #{approvedClientRequests}
+                |  approved client requests
+                | You have
                 strong  #{rejectedClientRequests}
                 |  rejected client requests
+                | You have
+                strong  #{deletedClientRequests}
+                |  deleted client requests
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
     hr
@@ -37,3 +40,12 @@ block content
         p Click here to assign students to accepted clients
         p
             a.btn.btn-default(href='#', role='button') View details »
+    hr
+    .row
+        h2 Manage email templates
+        p Click here to assign students to accepted clients
+            .col-sm-2
+                a.btn.btn-default(href='/instructor/add-template', role='button') Add a template »
+            .col-sm-2
+                a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
+    hr

@@ -154,6 +154,7 @@ app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportCo
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
 app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);
 app.post('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailClients);
+app.post('/instructor/email-clients/confirmation',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailConfirmation);
 
 // Dynamic content for client-proposals
 app.get('/instructor/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedProjects);
@@ -161,11 +162,18 @@ app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportCon
 app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
 app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
 
+//Email Templates
+app.get('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAddTemplate);
+app.post('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postAddTemplate);
+app.get('/instructor/modify-templates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getModifyTemplates);
+app.post('/instructor/modify-templates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postModifyTemplates);
+
 // JSON api
 app.get('/api/approvedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getApprovedJSON);
 app.get('/api/pendingProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getPendingJSON);
 app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedJSON);
 app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
+app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailTemplates);
 
 /**
  * Client routes
@@ -175,12 +183,15 @@ app.get('/client/agreement', clientController.getClientAgreement);
 app.get('/client/form', clientController.getClientForm);
 app.post('/client/form', clientController.postClientForm);
 app.get('/client/client-times', clientController.getClientTime);
+app.get('/client/submission-successful', clientController.getClientFormSubmitted)
 
 /**
  * Student routes
  */
 app.get('/student', studentController.getStudentForm);
+app.post('/student', studentController.postStudentForm);
 app.get('/student/resources', studentController.getStudentResources);
+app.get('/successfulSubmission', studentController.getSubmissionSuccess);
 
 /**
  * Error Handler.
