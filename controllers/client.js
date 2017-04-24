@@ -98,7 +98,7 @@ exports.postClientForm = (req, res, next) => {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect('client/clientForm');
+    return res.redirect('/client/form');
   }
 
   const client = new Client({
