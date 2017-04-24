@@ -1,26 +1,54 @@
 extends ../layout
 
 //-
-    Select name of client in dropdown
     Use preset time slots to choose from
     Store the numbers of the slots chosen in the database
     Use those numbers to determine final schedule
 
 block content
     .page-header
-        h3 Select Preferred Time Slots
+        h3 Hello, David!
 
-    form.form-horizontal(method='POST')
+    h4 Select your preferred time slots below.
+    h4 Each presentation slot is 15 minutes long.
+    hr
+    form.form-horizontal.text-center(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
-        .form-group
-            label(class='col-sm-2 control-label', for='name') Select your name:
-            .col-sm-8
-                select.form-control(name='name', id='name')
-                    each client in clients
-                        option= client.name
+        //.form-group
+        //    label(class='col-sm-2 control-label', for='name') Select your name:
+        //    .col-sm-8
+        //        select.form-control(name='name', id='name')
+        //            each client in clients
+        //                option= client.name
+        .form-group(name='select-form', id='select-form')
+            .form-inline
+                .form-group.col-sm-4
+                    .row
+                        select.form-control(multiple='', name='show-available-times', id='select-times')
+                            option Monday, 1/23, 9:10 AM
+                            option Monday, 1/23, 9:25 AM
+                            option Monday, 1/23, 9:40 AM
+                            option Monday, 1/23, 9:55 AM
+                            option Wednesday, 1/25, 9:10 AM
+                            option Wednesday, 1/25, 9:25 AM
+                            option Wednesday, 1/25, 9:40 AM
+                            option Wednesday, 1/25, 9:55 AM
+                    .row
+                        label(class='control-label', for='select-times') Available times
+                .form-group.col-sm-4
+                    .btn-group-vertical
+                            button.btn.btn-default.btn-sm#add-times-button
+                                | Add >>
+                            button.btn.btn-default.btn-sm#remove-times-button
+                                | << Remove
 
+                .form-group.col-sm-4
+                    .row
+                        select.form-control(multiple='', name='show-selected-times', id='added-times')
+                            option Chosen times will show up here...
+                    .row
+                        label(class='control-label', for='added-times') Selected times
         .form-group
-            .col-sm-offset-2.col-sm-8
+            .col-sm-12
                 button.btn.btn-primary(type='submit')
-                    i.fa.fa-envelope
-                    | Send
+                    | Submit

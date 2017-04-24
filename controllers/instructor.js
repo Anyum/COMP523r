@@ -3,16 +3,18 @@ const Email = require('../models/Email');
 const async = require('async');
 const nodemailer = require('nodemailer');
 const Students = require('../models/Student');
+const xoauth2 = require('xoauth2');
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
-        type: 'OAuth2',
-        user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
-        clientId: process.env.GMAIL_CLIENT_ID || '102432029371-k5r65rmg8fe144oeh5o1pb5mch88eaqm.apps.googleusercontent.com',
-        clientSecret: process.env.GMAIL_CLIENT_SECRET || 'c0Qg6aZjcw9Wns7vE7UViIeB',
-        refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/GuES49HKaJud_cXINNZcJJBx4QOQWprPIzWcRSFEQJo',
-        accessToken: process.env.GMAIL_ACCESS_TOKEN || 'ya29.GlsuBKxAvrF21iT5JTWOxlazjxvPE9pZy2GbUlpcGYKkywJPCcOfrAbCWVPem2uta5YWqpORp5rNesY8J_U3b3BmAL-T_84X_9WjFBQ_aBiTlDGtJg1-xElID-lI'
+        xoauth2: xoauth2.createXOAuth2Generator({
+            type: 'OAuth2',
+            user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
+            clientId: process.env.GMAIL_CLIENT_ID || '894458215286-knid5sq8k9hpp2mjcis72sonkjg66fsc.apps.googleusercontent.com',
+            clientSecret: process.env.GMAIL_CLIENT_SECRET || 'NIC_pTikyBFh59xa2kAeFOGH',
+            refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/0-kxyqBHlehh01wQW3-_GdhBKTjnoSv6E-meayhUaVogg0btU2Pp3o5Mr8lPjuyG'
+        })
     }
 });
 
@@ -239,13 +241,17 @@ exports.postEmailConfirmation = (req, res) => {
                     if (err) { return res.status(500).send(err); }
                 });
             } else if (decision == 'Automatic') {
+                //personalize the body of the message
+                var personalizedBody = body;
+                personalizedBody = personalizedBody.replace("{Client}", client.name);
+                personalizedBody = personalizedBody.replace("{Instructor}", senderName);
                 //Send email
                 // 'to' is a comma separated list of recipients  e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
                 var mailOptions = {
                     to: `${client.name} <${client.email}>`,
-                    from: `${senderName} <${transporter._options.auth.user}>`,
+                    from: `${senderName} <${transporter._options.auth.xoauth2.options.user}>`,
                     subject: subject,
-                    text: body
+                    text: personalizedBody
                 };
                 // verify connection configuration
                 transporter.verify(function(error, success) {

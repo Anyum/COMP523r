@@ -21,4 +21,19 @@ $(document).ready(function() {
 
     // Place JavaScript code here...
 
+    $('#add-times-button').on("click", function(e) {
+        e.preventDefault();
+        $('#select-times option:selected').each(function() {
+            $('#added-times').append($(this));
+        });
+        $('#added-times option:contains("Chosen times will show up here...")').remove();
+    });
+
+    $('#remove-times-button').on("click", function(e) {
+        e.preventDefault();
+        $('#added-times option:selected').each(function() {
+            $('#select-times').append($(this));
+        });
+    });
+
 });
