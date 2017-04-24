@@ -77,6 +77,15 @@ exports.getClientTime = (req, res) => {
 };
 
 /**
+ * POST /client-times
+ * Stores times in the database
+ * NOT FINISHED<--------------------
+ */
+exports.postClientTime = (req, res, next) => {
+    res.render('client/clientTimesSubmitted');
+}
+
+/**
  * POST /client-form
  * Submit a client request.
  */
