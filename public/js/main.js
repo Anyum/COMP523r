@@ -23,17 +23,21 @@ $(document).ready(function() {
 
     $('#add-times-button').on("click", function(e) {
         e.preventDefault();
-        $('#select-times option:selected').each(function() {
-            $('#added-times').append($(this));
+        $('#available option:selected').each(function() {
+            $('#added').append($(this));
         });
-        $('#added-times option:contains("Chosen times will show up here...")').remove();
+        $('#added option:contains("Chosen times will show up here...")').remove();
     });
 
     $('#remove-times-button').on("click", function(e) {
         e.preventDefault();
-        $('#added-times option:selected').each(function() {
-            $('#select-times').append($(this));
+        $('#added option:selected').each(function() {
+            $('#available').append($(this));
         });
+    });
+
+    $('#timeform').on("submit", function(e) {
+       $('#added option').prop('selected', true);
     });
 
 });
