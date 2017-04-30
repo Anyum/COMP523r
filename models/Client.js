@@ -17,7 +17,8 @@ const clientRequestSchema = new mongoose.Schema({
     sentPitchSchedule: Boolean,
     status: String,
     selectedTimes: [String],
-    presentationNote: String
+    presentationNote: String,
+    presentationTime: String
 
 }, { timestamps: true });
 

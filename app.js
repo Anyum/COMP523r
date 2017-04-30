@@ -175,6 +175,10 @@ app.get('/api/rejectedProjects',passportConfig.isAuthenticated,passportConfig.is
 app.get('/api/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedJSON);
 app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailTemplates);
 
+// Client time management
+app.get('/instructor/client-chosen-times',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientTimes);
+app.get('/instructor/assign-success',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAssignSuccess);
+
 // Student team stuff
 app.get('/instructor/view-student-submitted-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getSubmittedTeams);
 app.get('/instructor/generate-final-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getGeneratedTeams);

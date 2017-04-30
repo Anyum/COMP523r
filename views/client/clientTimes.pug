@@ -20,6 +20,7 @@ block content
                 select.form-control(name='name', id='name')
                     each client in clients
                         option= client.name
+        p
         .form-group(name='select-form', id='select-form')
             .form-inline
                 .form-group.col-sm-4
@@ -48,6 +49,11 @@ block content
                             option Chosen times will show up here...
                     .row
                         label(class='control-label', for='added') Selected times
+        p
+        .form-group
+            label(class='col-sm-2 control-label', for='note') Special notes:
+            .col-sm-8
+                textarea.form-control(name='note', id='note')
         .form-group
             .col-sm-12
                 button.btn.btn-primary(type='submit')

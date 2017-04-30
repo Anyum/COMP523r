@@ -82,7 +82,7 @@ exports.getClientTime = (req, res) => {
  */
 exports.postClientTime = (req, res, next) => {
     var query = {'name': req.body.name};
-    var update = { $set: {'selectedTimes': req.body.added}};
+    var update = { $set: {'selectedTimes': req.body.added, 'presentationNote': req.body.note}};
 
     Client.findOneAndUpdate(query, update, function(err, doc) {
        if(err) req.flash('errors', err);
@@ -90,10 +90,13 @@ exports.postClientTime = (req, res, next) => {
            // Client.findOne({'name': req.body.name}, 'selectedTimes', function(err, result) {
            //    res.render('client/clientTimesSubmitted', {times: result});
            // });
-           res.render('client/clientTimesSubmitted', {times: req.body.added});
+           res.render('client/clientTimesSubmitted', {
+               title: 'Submission Successful',
+               times: req.body.added
+           });
        }
     });
-}
+};
 
 /**
  * POST /client-form

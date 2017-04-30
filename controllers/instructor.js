@@ -3,6 +3,7 @@ const Email = require('../models/Email');
 const async = require('async');
 const nodemailer = require('nodemailer');
 const Students = require('../models/Student');
+const TimeList = require('../models/TimeList');
 const xoauth2 = require('xoauth2');
 
 var transporter = nodemailer.createTransport({
@@ -402,6 +403,92 @@ exports.postModifyTemplates= (req, res) => {
         }
     });
 };
+
+/**
+ * GET /instructor/client-chosen-times
+ * View the times that clients that selected, and be able to automatically assign final presentation times
+ */
+exports.getClientTimes = (req, res) => {
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}, (err, result) => {
+       if (err) return handleError(err);
+       res.render('instructor/instructorClientTimes', {
+          title: 'Client Time Preferences',
+          clients: result
+       });
+    });
+};
+
+/**
+ * GET /instructor/assign-success
+ * Assigns final presentation times and presents any messages from the algorithm
+ */
+exports.getAssignSuccess = (req, res) => {
+    var clientLists = new Array();
+    var times = new Array();
+    var messages = new Array();
+
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}).sort({'updatedAt': 'desc'}).exec().then(function(result) {
+
+        // Storing clients in an array
+        result.forEach(function(x) {
+            clientLists.push({
+                "name": x.name,
+                "times": x.selectedTimes,
+                "presTime": null
+            });
+        });
+
+        // Gathering relevant list of times
+        return TimeList.findOne({'current': true}, 'times', function(err, list) {
+            if (err) return handleError(err);
+            times = list.times;
+        }).exec().then(function() {return result});
+
+    }).then(function(result) {
+
+        // Assigning presentation times
+        for (var i=0; i<times.length; i++) {
+            var y = new Array();
+            var low = 1000;
+            var lowIx = new Array();
+            for (var j=0; j<clientLists.length; j++) {
+                if (clientLists[j].times.indexOf(times[i]) != -1) {
+                    y.push(clientLists[j]);
+                    if (clientLists[j].times.length < low) {
+                        if (clientLists[j].presTime == null) {
+                            low = clientLists[j].times.length;
+                            lowIx = [];
+                            lowIx.push(j);
+                        }
+                    } else if (clientLists[j].times.length == low) {
+                        if (clientLists[j].presTime == null)
+                            lowIx.push(j);
+                    }
+                }
+            }
+            if (lowIx.length > 0) {
+                clientLists[lowIx[0]].presTime = times[i];
+            }
+        }
+
+        // Updating presentation times in database
+        result.forEach(function(x) {
+            var ix = clientLists.findIndex(function(element) {return element.name == x.name;});
+            x.presentationTime = clientLists[ix].presTime;
+            x.save();
+            if (x.presentationTime == null)
+                messages.push("Client \'" + x.name + "\' did not receive a presentation time.");
+        });
+
+        // Rendering success page
+        res.render('instructor/instructorAssignSuccess', {
+            title: 'Results',
+            clients: result,
+            messages: messages
+        });
+    });
+};
+
 /**
  * GET /instructor/view-student-submitted-teams
  * Allows you to view-student-submitted-teams
