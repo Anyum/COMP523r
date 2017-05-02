@@ -25,9 +25,9 @@ var transporter = nodemailer.createTransport({
  */
 exports.getDashboard = (req, res) => {
     var locals = {};
-    // process all 3 queries in parallel
+    // process all 5 queries in parallel
     // all queries return a `callback` when complete
-    // waits for all 3 callbacks to process asynchronously, then proceeds
+    // waits for all 5 callbacks to process asynchronously, then proceeds
     async.parallel([
         // Undecided client proposals
         function(callback) {
@@ -60,8 +60,17 @@ exports.getDashboard = (req, res) => {
                 locals.deleted = count;
                 callback();
             });
+        },
+        // Current schedule
+        function(callback) {
+            TimeList.find({current: true}, (err, result) => {
+                if (err) return callback(err);
+                locals.schedule = result;
+                if (result.length > 1) locals.tooManySchedules = true;
+                callback();
+            });
         }
-    ], function(err) { //This function gets called after the three tasks have called their "task callbacks"
+    ], function(err) { //This function gets called after the five tasks have called their "task callbacks"
         if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
         //Here `locals` will be an object with `undecided`, `rejected` and `approved` keys
         res.render('instructor/instructorDashboard', {
@@ -69,7 +78,24 @@ exports.getDashboard = (req, res) => {
             pendingClientRequests: locals.undecided,
             rejectedClientRequests: locals.rejected,
             approvedClientRequests: locals.approved,
-            deletedClientRequests: locals.deleted
+            deletedClientRequests: locals.deleted,
+            schedule: locals.schedule,
+            tooManySchedules: locals.tooManySchedules
+        });
+    });
+};
+
+/**
+ * POST /
+ * This is only for settling multiple schedule conflicts
+ */
+exports.postDashboard = (req, res) => {
+    console.log(req.body.chosenschedule);
+    TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
+        if (err) return handleError(err);
+        TimeList.findOneAndUpdate({name: req.body.chosenschedule}, {$set: {current: true}}, function(err, x) {
+            if (err) return handleError(err);
+            res.redirect('back');
         });
     });
 };
@@ -409,7 +435,7 @@ exports.postModifyTemplates= (req, res) => {
  * View the times that clients that selected, and be able to automatically assign final presentation times
  */
 exports.getClientTimes = (req, res) => {
-    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}, (err, result) => {
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}, {selectedTimes: {$not: {$size: 0}}}]}, (err, result) => {
        if (err) return handleError(err);
        res.render('instructor/instructorClientTimes', {
           title: 'Client Time Preferences',
@@ -427,7 +453,7 @@ exports.getAssignSuccess = (req, res) => {
     var times = new Array();
     var messages = new Array();
 
-    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}).sort({'updatedAt': 'desc'}).exec().then(function(result) {
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}, {selectedTimes: {$not: {$size: 0}}}]}).sort({'updatedAt': 'desc'}).exec().then(function(result) {
 
         // Storing clients in an array
         result.forEach(function(x) {

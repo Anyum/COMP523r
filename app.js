@@ -150,6 +150,7 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
  */
 // check if they are logged in, then check if they are an instructor, only then let them get the page
 app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
+app.post('/instructor', passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postDashboard);
 app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
 app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);

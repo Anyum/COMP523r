@@ -1,6 +1,9 @@
 extends ../layout
 
 block content
+    #breadcrumb
+    script.
+        $('#breadcrumb').append(createBreadcrumb());
     .page-header
         h3 Client Time Preferences
 
@@ -33,6 +36,6 @@ block content
                 .li.list-group-item
                     strong Presentation Time:
                     .p.card-text
-                    strong |  #{client.presentationTime}
+                    strong #{client.presentationTime}
     p
         a.btn.btn-default(href='/instructor/assign-success', role='button') Generate final schedules

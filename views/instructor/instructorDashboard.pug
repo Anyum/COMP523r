@@ -4,6 +4,16 @@ block content
     h1 Instructor Dashboard
     p.lead Manage new client requests, create student teams, and manage student teams
     hr
+
+    // Alerts the instructor if more than one schedule is active in the database
+    if schedule.length > 1
+        .alert.alert-danger
+            | More than one schedule is active!
+            |
+            a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
+    else
+        h4.text-center Active client schedule: #{schedule[0].name}
+
     .row
             h2 Manage Client Requests
             p(style='white-space:pre;')
@@ -55,3 +65,22 @@ block content
             .col-sm-2
                 a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
     hr
+
+
+    // Modal for solving multiple active schedules
+    #scheduleModal.modal.fade(role='dialog')
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type='button', data-dismiss='modal') &times;
+                    h2.modal-title Choose Current Schedule
+                .modal-body
+                    form(method='POST')
+                        input(type='hidden', name='_csrf', value=_csrf)
+                        .form-group
+                            each x in schedule
+                                input(type='radio', name='chosenschedule', value=x.name)
+                                | #{x.name}
+                                p
+                        .form-group
+                            button.btn.btn-primary(type='submit') Make Current

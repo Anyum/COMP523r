@@ -1,16 +1,15 @@
 extends ../layout
 
-//-
-    Use preset time slots to choose from
-    Store the numbers of the slots chosen in the database
-    Use those numbers to determine final schedule
+block extraHeader
+    script(src='/js/times.js')
 
 block content
+    #message
     .page-header
         h3 Presentation Times
 
     h4 Select your preferred time slots below.
-    h4 Each presentation slot is 15 minutes long.
+    h4 Each presentation slot is 5 minutes long.
     hr
     form.form-horizontal.text-center(method='POST', id='timeform')
         input(type='hidden', name='_csrf', value=_csrf)
@@ -26,14 +25,8 @@ block content
                 .form-group.col-sm-4
                     .row
                         select.form-control(multiple='', name='available[]', id='available')
-                            option Monday, 1/23, 9:10 AM
-                            option Monday, 1/23, 9:25 AM
-                            option Monday, 1/23, 9:40 AM
-                            option Monday, 1/23, 9:55 AM
-                            option Wednesday, 1/25, 9:10 AM
-                            option Wednesday, 1/25, 9:25 AM
-                            option Wednesday, 1/25, 9:40 AM
-                            option Wednesday, 1/25, 9:55 AM
+                            each time in timelist
+                                option= time
                     .row
                         label(class='control-label', for='available') Available times
                 .form-group.col-sm-4
