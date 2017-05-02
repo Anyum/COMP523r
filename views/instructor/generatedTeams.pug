@@ -10,7 +10,11 @@ block content
                 p Group Size: #{team.numStudents}
                 p Group Members: #{team.student1}, #{team.student2}, #{team.student3}, #{team.student4}
                 p Project Preferences: #{team.preferenceList}
-
+    hr
+    if unassigned_student_names
+        h2 Unassigned student are:
+        each name in unassigned_student_names
+            p #{name}
 
     hr
     .row
