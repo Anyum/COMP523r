@@ -5,6 +5,7 @@ require('sinon-mongoose');
 
 const User = require('../models/User');
 const Student = require('../models/Student');
+const Client = require('../models/Client');
 
 describe('User Model', () => {
   it('should create a new user', (done) => {
@@ -149,3 +150,57 @@ describe('Student Submission Form', () => {
   });
 });
 
+describe('Client Submission Form', () => {
+  it('should create a new client form', (done) => {
+    const ClientMock = sinon.mock(new Client({ email: "string",
+      name: "string",
+      organization: "string",
+      presentation: "string",
+      project: "string",
+      description: "desc",
+      term: "term",
+      isDecided: false,
+      isApproved: false,
+      isDeleted: false,
+      sentApproval: false,
+      sentDenial: false,
+      sentDeletion: false,
+      sentPitchSchedule: false,
+      status: "false",
+      selectedTimes: ["9am"],
+      presentationNote: "notes",
+      presentationTime: "wooo"}));
+    const client = ClientMock.object;
+
+    ClientMock
+        .expects('save')
+        .yields(null);
+
+    client.save(function (err, result) {
+      ClientMock.verify();
+      ClientMock.restore();
+      expect(err).to.be.null;
+      done();
+    });
+  });
+
+  it('should return error if client is not created', (done) => {
+    const ClientMock = sinon.mock(new Client({ numStudents: "5", password: 'root' }));
+    const client = ClientMock.object;
+    const expectedError = {
+      name: 'ValidationError'
+    };
+
+    ClientMock
+        .expects('save')
+        .yields(expectedError);
+
+    client.save((err, result) => {
+      ClientMock.verify();
+      ClientMock.restore();
+      expect(err.name).to.equal('ValidationError');
+      expect(result).to.be.undefined;
+      done();
+    });
+  });
+});
