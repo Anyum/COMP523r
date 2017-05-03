@@ -81,6 +81,6 @@ exports.isInstructor = (req, res, next) => {
   if(user.isInstructor){
     next();
   } else {
-    res.send('you are not an instructor!!');
+    res.redirect('/');
   }
 };

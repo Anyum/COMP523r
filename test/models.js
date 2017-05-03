@@ -4,6 +4,7 @@ const sinon = require('sinon');
 require('sinon-mongoose');
 
 const User = require('../models/User');
+const Student = require('../models/Student');
 
 describe('User Model', () => {
   it('should create a new user', (done) => {
@@ -104,3 +105,47 @@ describe('User Model', () => {
     })
   });
 });
+
+describe('Student Submission Form', () => {
+  it('should create a new student form', (done) => {
+    const StudentMock = sinon.mock(new Student({ numStudents: "4",
+      student1: "Bob",
+      student2: "Bill",
+      student3: "Stacy",
+      student4: "May",
+      preferenceList: "A,B,C,D" }));
+    const student = StudentMock.object;
+
+    StudentMock
+        .expects('save')
+        .yields(null);
+
+    student.save(function (err, result) {
+      StudentMock.verify();
+      StudentMock.restore();
+      expect(err).to.be.null;
+      done();
+    });
+  });
+
+  it('should return error if student is not created', (done) => {
+    const StudentMock = sinon.mock(new Student({ numStudents: "5", password: 'root' }));
+    const student = StudentMock.object;
+    const expectedError = {
+      name: 'ValidationError'
+    };
+
+    StudentMock
+        .expects('save')
+        .yields(expectedError);
+
+    student.save((err, result) => {
+      StudentMock.verify();
+      StudentMock.restore();
+      expect(err.name).to.equal('ValidationError');
+      expect(result).to.be.undefined;
+      done();
+    });
+  });
+});
+
