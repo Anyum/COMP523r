@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const Students = require('../models/Student');
 const TimeList = require('../models/TimeList');
 const xoauth2 = require('xoauth2');
+const GeneratedTeams = require('../models/GeneratedTeams');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -533,13 +534,179 @@ exports.getSubmittedTeams = (req, res) => {
  * Allows you to generate-final-teams
  */
 exports.getGeneratedTeams = (req, res) => {
-    Students.find({}, (err, Students) => {
-        if (err) return handleError(err);
-    res.render('instructor/generatedTeams', {
-        title: 'Generated Teams of 4',
-        studentTeams: Students
+
+    var t4 = new Array();
+    var t3 = new Array();
+    var t2 = new Array();
+    var t1 = new Array();
+    var unassigned_student_names = new Array;
+
+    Students.find({}).then(function(result) {
+
+        result.forEach(function(x) {
+
+            if(x.numStudents==4){
+                t4.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "student3": x.student3,
+                    "student4": x.student4,
+                    "preferenceList": x.preferenceList
+                });
+            } else if(x.numStudents == 3){
+                t3.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "student3": x.student3,
+                    "preferenceList": x.preferenceList
+                });
+            } else if(x.numStudents == 2){
+                t2.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "preferenceList": x.preferenceList
+                });
+            } else {
+                t1.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "preferenceList": x.preferenceList
+                });
+            }
+
+        });
+
+        //making teams of 3 into teams of 4
+        while(t3.length!=0){
+            if(t1.length!=0){ //combining teams of 1 to teams of 3 if possible
+                var popped3 = t3.pop();
+                var popped1 = t1.pop();
+                t4.push({
+                    "numStudents": popped3.numStudents+":"+popped1.numStudents,
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "student3": popped3.student3,
+                    "student4": popped1.student1,
+                    "preferenceList": popped3.preferenceList
+                });
+            }else if(t2.length!=0){ //breaking up teams of 2 to make teams of 3 into teams of 4
+                var popped3 = t3.pop();
+                var popped2 = t2.pop();
+                t4.push({
+                    "numStudents": popped3.numStudents+":"+popped2.numStudents+"(s1)",
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "student3": popped3.student3,
+                    "student4": popped2.student1,
+                    "preferenceList": popped3.preferenceList
+                });
+                t1.push({
+                    "numStudents": popped2.numStudents+"(s2)",
+                    "student1": popped2.student2,
+                    "preferenceList": popped2.preferenceList
+                });
+            }else{ //break teams of 3 since those are the only teams left if this else is ever excuted
+                var popped3 = t3.pop();
+                t2.push({ //putting s1, s2 of the popped t3 into t2
+                    "numStudents": popped3.numStudents+"(s1,s2)",
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "preferenceList": popped3.preferenceList
+                });
+                t1.push({ //pushing s3 of the popped t3 into t1
+                    "numStudents": popped3.numStudents+"(s3)",
+                    "student1": popped3.student3,
+                    "preferenceList": popped3.preferenceList
+                });
+            }
+        }
+        while(t2.length!=0){
+            if(t2.length>1){ //if you have more than 1 team of two then compbine teams of 2 to make teams of 4
+                var popped2_1 = t2.pop();
+                var popped2_2 = t2.pop();
+                t4.push({
+                    "numStudents": popped2_1.numStudents+":"+popped2_2.numStudents,
+                    "student1": popped2_1.student1,
+                    "student2": popped2_1.student2,
+                    "student3": popped2_2.student1,
+                    "student4": popped2_2.student2,
+                    "preferenceList": popped2_1.preferenceList
+                });
+            }else if(t1.length>1){ //have at least 2 teams of one
+                var popped2 = t2.pop();
+                var popped1_1 = t1.pop();
+                var popped1_2 = t1.pop();
+                t4.push({
+                    "numStudents": popped2.numStudents+":"+popped1_1.numStudents+":"+popped1_2.numStudents,
+                    "student1": popped2.student1,
+                    "student2": popped2.student2,
+                    "student3": popped1_1.student1,
+                    "student4": popped1_2.student1,
+                    "preferenceList": popped2.preferenceList
+                });
+            }
+            else { //you have only one team of 2 left so we break it into teams of 1
+                var popped2 = t2.pop();
+                t1.push({
+                    "numStudents": popped2.numStudents + "(s1)",
+                    "student1": popped2.student1,
+                    "preferenceList": popped2.preferenceList
+                });
+                t1.push({
+                    "numStudents": popped2.numStudents + "(s2)",
+                    "student1": popped2.student2,
+                    "preferenceList": popped2.preferenceList
+                });
+            }
+        }
+        while(t1.length!=0){
+            if(t1.length>3){
+                var popped1_1= t1.pop();
+                var popped1_2= t1.pop();
+                var popped1_3= t1.pop();
+                var popped1_4= t1.pop();
+                t4.push({
+                    "numStudents": popped1_1.numStudents+":"+popped1_2.numStudents+":"+popped1_3.numStudents+":"+popped1_4.numStudents,
+                    "student1": popped1_1.student1,
+                    "student2": popped1_2.student1,
+                    "student3": popped1_3.student1,
+                    "student4": popped1_4.student1,
+                    "preferenceList": popped1_1.preferenceList
+                });
+            }else{
+                while(t1.length!=0){
+                    unassigned_student_names.push(t1.pop().student1);
+                }
+            }
+        }
+
+        GeneratedTeams.remove({},function(err, removed){
+        });
+
+        for(var i=0; i<t4.length; i++){
+            const generatedTeam = new GeneratedTeams({
+                teamNumber: i,
+                numStudents: t4[i].numStudents,
+                student1: t4[i].student1,
+                student2: t4[i].student2,
+                student3: t4[i].student3,
+                student4: t4[i].student4,
+                preferenceList: t4[i].preferenceList
+            });
+            generatedTeam.save();
+        }
+
+    }).then(function() {
+
+        res.render('instructor/generatedTeams', {
+            title: 'Generated Teams of 4',
+            studentTeams: t4,
+            unassigned_student_names: unassigned_student_names
+        });
     });
-});
 };
 
 /**
@@ -547,12 +714,11 @@ exports.getGeneratedTeams = (req, res) => {
  * Allows you to compute-team-mapping-to-projects
  */
 exports.getTeamMappingToProjects = (req, res) => {
-    Students.find({}, (err, Students) => {
+    GeneratedTeams.find({}, (err, generatedTeams) => {
         if (err) return handleError(err);
     res.render('instructor/teamMappingToProjects', {
         title: 'Team Mapping To Projects',
-        studentTeams: Students,
-        projects: [1,2,3,4,5,6,7,8,9,10,11,12]
+        generatedTeams: generatedTeams
     });
 });
 };
