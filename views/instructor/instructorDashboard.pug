@@ -6,13 +6,19 @@ block content
     hr
 
     // Alerts the instructor if more than one schedule is active in the database
-    if schedule.length > 1
-        .alert.alert-danger
-            | More than one schedule is active!
-            |
-            a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
+    if schedule
+        if schedule.length > 0
+            if schedule.length > 1
+                .alert.alert-danger
+                    | More than one schedule is active!
+                    |
+                    a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
+            else
+                h4.text-center Active client schedule: #{schedule[0].name}
+        else
+            h4.text-center You do not have an active schedule!
     else
-        h4.text-center Active client schedule: #{schedule[0].name}
+        h4.text-center You do not have an active schedule!
 
     .row
             h2 Manage Client Requests
@@ -78,9 +84,11 @@ block content
                     form(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         .form-group
-                            each x in schedule
-                                input(type='radio', name='chosenschedule', value=x.name)
-                                | #{x.name}
-                                p
+                            if schedule
+                                if schedule.length > 0
+                                    each x in schedule
+                                        input(type='radio', name='chosenschedule', value=x.name)
+                                        | #{x.name}
+                                        p
                         .form-group
                             button.btn.btn-primary(type='submit') Make Current
