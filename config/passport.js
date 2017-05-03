@@ -81,6 +81,6 @@ exports.isInstructor = (req, res, next) => {
   if(user.isInstructor){
     next();
   } else {
-    res.redirect('/');
+    res.redirect('/login');
   }
 };
