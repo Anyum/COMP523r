@@ -51,7 +51,6 @@ exports.postStudentForm = (req, res, next) => {
     for(var x=0; x<12; x++){
         if( projLetters.indexOf(String.fromCharCode(97 + x)) == -1){
             errors=[{msg: "Make sure your preferences include all letters a-l and that each one is only selected once."}];
-
         }
     }
 
