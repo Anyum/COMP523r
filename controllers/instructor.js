@@ -684,26 +684,36 @@ exports.getGeneratedTeams = (req, res) => {
             }
         }
 
-        GeneratedTeams.remove({},function(err, removed){
-            if(err){
-                console.log(err);
-            }else{
-                for(var i=0; i<t4.length; i++){
-                    t4[i].teamNumber = i;
-                    const generatedTeam = new GeneratedTeams({
-                        teamNumber: i,
-                        assignedProject: "unassigned",
-                        numStudents: t4[i].numStudents,
-                        student1: t4[i].student1,
-                        student2: t4[i].student2,
-                        student3: t4[i].student3,
-                        student4: t4[i].student4,
-                        preferenceList: t4[i].preferenceList
-                    });
-                    generatedTeam.save();
-                }
+        function removeTeams(callback) {
+            GeneratedTeams.remove({},function(err, removed){callback(err, removed);});
+        }
+        function addTeams(callback) {
+            for (var i = 0; i < t4.length; i++) {
+                t4[i].teamNumber = i;
+                const generatedTeam = new GeneratedTeams({
+                    teamNumber: i,
+                    assignedProject: "unassigned",
+                    numStudents: t4[i].numStudents,
+                    student1: t4[i].student1,
+                    student2: t4[i].student2,
+                    student3: t4[i].student3,
+                    student4: t4[i].student4,
+                    preferenceList: t4[i].preferenceList
+                });
+                generatedTeam.save();
             }
+            callback();
+        }
+        operations = [];
+
+        operations.push(removeTeams);
+        operations.push(addTeams);
+
+        async.series(operations, function (err, results) {
+            // results[1]
+            // results[2]
         });
+
         if(t4.length==12){
             canGenerateMapping = true;
         }
