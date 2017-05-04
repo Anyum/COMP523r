@@ -767,15 +767,15 @@ exports.getTeamMappingToProjects = (req, res) => {
 
         result.forEach(function(x){ //building up team preference list in reverse order to take advantage of pop function later on
             var i = parseInt(x.teamNumber);
+            //console.log(i);
             tRankList[i] = new Array();
             for(var j=0; j<numTeams; j++){
-                tRankList[i][numTeams-j-1] = x.preferenceList.charCodeAt((j*3)) - 97;
-                //console.log(tRankList[i][j]);
+                tRankList[i][numTeams-j-1] = x.preferenceList.charCodeAt((j*2)) - 97;
+                //console.log(tRankList[i][numTeams-j-1]);
             }
         });
 
         while(tFree.length!=0){ //while there are free teams map the teams
-
             for(var i=0;i<tFree.length;i++){ //going through all the free teams
                 var currTeamNumber = tFree[i];
                 var currTeamsNextPreference = tRankList[currTeamNumber].pop();  //getting the next preference
