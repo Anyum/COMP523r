@@ -540,6 +540,7 @@ exports.getGeneratedTeams = (req, res) => {
     var t2 = new Array();
     var t1 = new Array();
     var unassigned_student_names = new Array;
+    var canGenerateMapping = false;
 
     Students.find({}).then(function(result) {
 
@@ -687,8 +688,10 @@ exports.getGeneratedTeams = (req, res) => {
         });
 
         for(var i=0; i<t4.length; i++){
+            t4[i].teamNumber = i;
             const generatedTeam = new GeneratedTeams({
                 teamNumber: i,
+                assignedProject: "unassigned",
                 numStudents: t4[i].numStudents,
                 student1: t4[i].student1,
                 student2: t4[i].student2,
@@ -698,13 +701,17 @@ exports.getGeneratedTeams = (req, res) => {
             });
             generatedTeam.save();
         }
+        if(t4.length==12){
+            canGenerateMapping = true;
+        }
 
     }).then(function() {
 
         res.render('instructor/generatedTeams', {
             title: 'Generated Teams of 4',
-            studentTeams: t4,
-            unassigned_student_names: unassigned_student_names
+            generatedTeams: t4,
+            unassigned_student_names: unassigned_student_names,
+            canGenerateMapping: canGenerateMapping
         });
     });
 };
@@ -714,11 +721,90 @@ exports.getGeneratedTeams = (req, res) => {
  * Allows you to compute-team-mapping-to-projects
  */
 exports.getTeamMappingToProjects = (req, res) => {
-    GeneratedTeams.find({}, (err, generatedTeams) => {
-        if (err) return handleError(err);
-    res.render('instructor/teamMappingToProjects', {
-        title: 'Team Mapping To Projects',
-        generatedTeams: generatedTeams
+
+    var numTeams = 12;
+    var pRankList = new Array(numTeams);  //randomizing project rank order of teams
+
+    /*pRankList[0]=[1, 3, 2, 0];    //test configeration
+    pRankList[1]=[2, 0, 3, 1];
+    pRankList[2]=[1, 2, 3, 0];
+    pRankList[3]=[0, 1, 3, 2];*/
+
+    for(var i=0; i<numTeams; i++){ //randomizing project rank order of teams
+        var randArr = new Array();
+        for(var j=0; j<numTeams; j++){
+            randArr.push(j);
+        }
+        for (var j=0; j<numTeams; j++){
+            var rand = Math.floor(Math.random() * numTeams);
+            var temp = randArr[j];
+            randArr[j] = randArr[rand];
+            randArr[rand] = temp;
+        }
+
+        pRankList[i]=randArr;
+
+        /*var s = "[";
+        for(var j=0; j<numTeams; j++){
+            s+=randArr[j]+", ";
+        }
+        console.log(s);*/
+    }
+
+    var tRankList = new Array(numTeams);  //will contain team rank order of projects
+
+    var tFree = new Array();    //will contain free teams
+    var pPariedTo = new Array();   //will contain paring of projects to teams (index= project, value=team#) -1 means project is free
+
+    for(var i=0; i<numTeams; i++){ //initalizing all teams to be free and project paring to be free
+        tFree.push(i);
+        pPariedTo.push(-1); //-1 means the project is free
+    }
+
+    var finalMapping = new Array();
+
+    GeneratedTeams.find({}).then(function(result) {
+
+        result.forEach(function(x){ //building up team preference list in reverse order to take advantage of pop function later on
+            var i = parseInt(x.teamNumber);
+            tRankList[i] = new Array();
+            for(var j=0; j<numTeams; j++){
+                tRankList[i][numTeams-j-1] = x.preferenceList.charCodeAt((j*3)) - 97;
+                //console.log(tRankList[i][j]);
+            }
+        });
+
+        while(tFree.length!=0){ //while there are free teams map the teams
+
+            for(var i=0;i<tFree.length;i++){ //going through all the free teams
+                var currTeamNumber = tFree[i];
+                var currTeamsNextPreference = tRankList[currTeamNumber].pop();  //getting the next preference
+                //var isNextPreferenceFree = false;
+                var nextPreferenceIsPairedTo = pPariedTo[currTeamsNextPreference];  //getting who the preference is paired to
+
+                if(nextPreferenceIsPairedTo==-1){ // next preferenc is not paired
+                    pPariedTo[currTeamsNextPreference] = currTeamNumber;  //updating pPairedTo include new pairing
+                    tFree.splice(i,1); //removing team i from free teams
+                }else{
+                    var nextPreferencesRankList = pRankList[currTeamsNextPreference];
+                    if(nextPreferencesRankList.indexOf(nextPreferenceIsPairedTo)>nextPreferencesRankList.indexOf(currTeamNumber)){
+                        tFree[i] = nextPreferenceIsPairedTo;
+                        pPariedTo[currTeamsNextPreference] = currTeamNumber;
+                    }
+
+                }
+
+            }
+        }
+
+        for(var i=0; i<pPariedTo.length; i++){
+            finalMapping[i] = "Project " + String.fromCharCode(97 + i) + " is assigned to team "+ pPariedTo[i];
+        }
+
+
+        res.render('instructor/teamMappingToProjects', {
+            title: 'Team Mapping To Projects',
+            finalMapping: finalMapping
+        });
     });
-});
 };

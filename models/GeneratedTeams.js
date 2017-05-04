@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const generatedRequestSchema = new mongoose.Schema({
     teamNumber: String,
+    assignedProject: String,
     numStudents: String,
     student1: String,
     student2: String,
