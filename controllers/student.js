@@ -59,6 +59,9 @@ exports.postStudentForm = (req, res, next) => {
         return res.redirect('/student');
     }
 
+    Student.remove({},function(err, removed){
+    });
+
     const student = new Student({
         numStudents: req.body.numStudents,
         student1: req.body.student1,
