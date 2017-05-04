@@ -687,7 +687,10 @@ exports.getGeneratedTeams = (req, res) => {
 
 
         function removeTeams(callback) {
-            GeneratedTeams.remove({});
+            //GeneratedTeams.remove({});
+            GeneratedTeams.remove({},function(err, removed){
+            });
+
         }
         function addTeams(callback) {
             for (var i = 0; i < t4.length; i++) {
