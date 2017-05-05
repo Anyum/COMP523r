@@ -6,18 +6,21 @@ block content
     hr
 
     // Alerts the instructor if more than one schedule is active in the database
-    if schedule.length > 0
-        if schedule.length > 1
+    if current.length > 0
+        if current.length > 1
             .alert.alert-danger
                 | More than one schedule is active!
                 |
                 a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
         else
-            h4.text-center Active client schedule: #{schedule[0].name}
+            h4.text-center Active client schedule: #{current[0].name}
             p.text-center
-                a(href='/instructor/schedule-edit') Change
+                a(href='#', data-toggle='modal', data-target='#scheduleModal') Change
     else
-        h4.text-center You do not have an active schedule!
+        .alert.alert-danger
+            | You do not have an active schedule!
+            |
+            a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
 
     .row
             h2 Manage Client Requests
@@ -41,6 +44,7 @@ block content
     .row
         h2 Manage Client Emails
         p Send emails to approved, pending, or rejected clients.
+        p (Time selection link: https://comp523.cloudapps.unc.edu/client/client-times)
         p
             a.btn.btn-default(href='/instructor/email-clients', role='button') View details »
     hr
@@ -72,21 +76,26 @@ block content
     hr
 
 
-    // Modal for solving multiple active schedules
+    // Modal for choosing new schedule
     #scheduleModal.modal.fade(role='dialog')
         .modal-dialog
             .modal-content
                 .modal-header
                     button.close(type='button', data-dismiss='modal') &times;
-                    h2.modal-title Choose Current Schedule
+                    h2.modal-title Choose a Schedule to Make Active
                 .modal-body
                     form(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         .form-group
-                            if schedule.length > 0
-                                each x in schedule
+                            if schedules.length > 0
+                                each x in schedules
                                     input(type='radio', name='chosenschedule', value=x.name)
                                     | #{x.name}
                                     p
-                        .form-group
-                            button.btn.btn-primary(type='submit') Make Current
+                                .form-group
+                                    button.btn.btn-primary(type='submit') Set as active
+                            else
+                                p No schedules to show
+                    p
+                        strong Make a new schedule or modifying your existing one:
+                        a.btn.btn-primary(href='/instructor/schedule-edit', role='button') Make/Modify Schedule

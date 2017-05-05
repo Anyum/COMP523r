@@ -62,12 +62,16 @@ exports.getDashboard = (req, res) => {
                 callback();
             });
         },
-        // Current schedule
+        // List of all schedule and current schedule
         function(callback) {
-            TimeList.find({current: true}, (err, result) => {
+            TimeList.find({}, (err, result) => {
                 if (err) return callback(err);
-                locals.schedule = result;
-                if (result.length > 1) locals.tooManySchedules = true;
+                locals.schedules = result;
+                locals.currentSchedule = [];
+                result.forEach(function(x) {
+                    if (x.current)
+                        locals.currentSchedule.push(x);
+                });
                 callback();
             });
         }
@@ -80,8 +84,8 @@ exports.getDashboard = (req, res) => {
             rejectedClientRequests: locals.rejected,
             approvedClientRequests: locals.approved,
             deletedClientRequests: locals.deleted,
-            schedule: locals.schedule,
-            tooManySchedules: locals.tooManySchedules
+            schedules: locals.schedules,
+            current: locals.currentSchedule,
         });
     });
 };
@@ -473,6 +477,16 @@ exports.getAssignSuccess = (req, res) => {
     }).then(function(result) {
 
         // Assigning presentation times
+        /**
+         * The algorithm for assigning times to clients is as follows:
+         *      For each time, produce a list of clients who have selected that time.
+         *
+         *      Of those clients, assign the time to the client who had selected the LEAST
+         *      number of total time slots.
+         *
+         *      If more than one client ties for least number of slots, assign the time to
+         *      the client who had completed the form the EARLIEST.
+         */
         for (var i=0; i<times.length; i++) {
             var y = new Array();
             var low = 1000;
@@ -524,11 +538,17 @@ exports.getAssignSuccess = (req, res) => {
 exports.getScheduleEdit = (req, res) => {
     TimeList.findOne({'current': true}, function(err, list) {
         if (err) return handleError(err);
-        var times = list.times.join('\n');
-        console.log(times);
+        var times, name;
+        if (list) {
+            name = list.name;
+            times = list.times.join('\n');
+        } else {
+            name = '';
+            times = [];
+        }
         res.render('instructor/scheduleEdit', {
             title: 'Schedule Edit',
-            name: list.name,
+            name: name,
             schedule: times
         });
     });
@@ -540,9 +560,14 @@ exports.getScheduleEdit = (req, res) => {
  */
 exports.postScheduleEdit = (req, res) => {
     var times = req.body.times.split(/\r\n|\r|\n/g);
+    var makeCurrent;
+    if (req.body.active == 'Yes')
+        makeCurrent = true;
+    else
+        makeCurrent = false;
     TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
         if (err) return handleError(err);
-        TimeList.findOneAndUpdate({'name': req.body.name}, {$set: {'times': times, 'current': req.body.active}}, {'upsert': true}, function(err, result) {
+        TimeList.findOneAndUpdate({'name': req.body.name}, {$set: {'times': times, 'current': makeCurrent}}, {'upsert': true}, function(err, result) {
             if (err) return handleError(err);
             res.render('instructor/scheduleSuccess', {
                 title: 'Success',
