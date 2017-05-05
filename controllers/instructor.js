@@ -91,7 +91,6 @@ exports.getDashboard = (req, res) => {
  * This is only for settling multiple schedule conflicts
  */
 exports.postDashboard = (req, res) => {
-    console.log(req.body.chosenschedule);
     TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
         if (err) return handleError(err);
         TimeList.findOneAndUpdate({name: req.body.chosenschedule}, {$set: {current: true}}, function(err, x) {
@@ -511,7 +510,44 @@ exports.getAssignSuccess = (req, res) => {
         res.render('instructor/instructorAssignSuccess', {
             title: 'Results',
             clients: result,
-            messages: messages
+            messages: messages,
+            times: times
+        });
+    });
+};
+
+/**
+ * GET /instructor/schedule-edit
+ * Edit or create new schedules (TimeList)
+ */
+
+exports.getScheduleEdit = (req, res) => {
+    TimeList.findOne({'current': true}, function(err, list) {
+        if (err) return handleError(err);
+        var times = list.times.join('\n');
+        console.log(times);
+        res.render('instructor/scheduleEdit', {
+            title: 'Schedule Edit',
+            name: list.name,
+            schedule: times
+        });
+    });
+};
+
+/**
+ * POST /instructor/schedule-edit
+ * Save new or updated schedule (TimeList)
+ */
+exports.postScheduleEdit = (req, res) => {
+    var times = req.body.times.split(/\r\n|\r|\n/g);
+    TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
+        if (err) return handleError(err);
+        TimeList.findOneAndUpdate({'name': req.body.name}, {$set: {'times': times, 'current': req.body.active}}, {'upsert': true}, function(err, result) {
+            if (err) return handleError(err);
+            res.render('instructor/scheduleSuccess', {
+                title: 'Success',
+                times: times
+            });
         });
     });
 };

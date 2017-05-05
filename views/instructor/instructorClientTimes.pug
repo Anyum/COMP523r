@@ -11,12 +11,14 @@ block content
     h4 You can view all times below, and you can also generate finalized schedules by the clicking the button "Generate final schedules".
     hr
     p
+        a.btn-btn-primary(href='/instructor/schedule-view', role='button') Schedule view
+    p
         a.btn.btn-default(href='/instructor/assign-success', role='button') Generate final schedules
     if clients
         each client in clients
             .panel.panel-default
                 .panel-heading
-                    h4.p.card-text #{client.name}
+                    h4.p.card-text #{client.name}: #{client.presentationTime}
                 .li.list-group-item
                     strong Project name:
                     .p.card-text
@@ -33,9 +35,5 @@ block content
                     strong Special Note:
                     .p.card-text
                     |  #{client.presentationNote}
-                .li.list-group-item
-                    strong Presentation Time:
-                    .p.card-text
-                    strong #{client.presentationTime}
     p
         a.btn.btn-default(href='/instructor/assign-success', role='button') Generate final schedules

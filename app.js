@@ -179,6 +179,8 @@ app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isIn
 // Client time management
 app.get('/instructor/client-chosen-times',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientTimes);
 app.get('/instructor/assign-success',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAssignSuccess);
+app.get('/instructor/schedule-edit',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getScheduleEdit);
+app.post('/instructor/schedule-edit',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postScheduleEdit);
 
 // Student team stuff
 app.get('/instructor/view-student-submitted-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getSubmittedTeams);

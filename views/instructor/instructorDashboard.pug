@@ -6,17 +6,16 @@ block content
     hr
 
     // Alerts the instructor if more than one schedule is active in the database
-    if schedule
-        if schedule.length > 0
-            if schedule.length > 1
-                .alert.alert-danger
-                    | More than one schedule is active!
-                    |
-                    a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
-            else
-                h4.text-center Active client schedule: #{schedule[0].name}
+    if schedule.length > 0
+        if schedule.length > 1
+            .alert.alert-danger
+                | More than one schedule is active!
+                |
+                a.alert-link(href='#', data-toggle='modal', data-target='#scheduleModal') Click here to fix.
         else
-            h4.text-center You do not have an active schedule!
+            h4.text-center Active client schedule: #{schedule[0].name}
+            p.text-center
+                a(href='/instructor/schedule-edit') Change
     else
         h4.text-center You do not have an active schedule!
 
@@ -84,11 +83,10 @@ block content
                     form(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         .form-group
-                            if schedule
-                                if schedule.length > 0
-                                    each x in schedule
-                                        input(type='radio', name='chosenschedule', value=x.name)
-                                        | #{x.name}
-                                        p
+                            if schedule.length > 0
+                                each x in schedule
+                                    input(type='radio', name='chosenschedule', value=x.name)
+                                    | #{x.name}
+                                    p
                         .form-group
                             button.btn.btn-primary(type='submit') Make Current
