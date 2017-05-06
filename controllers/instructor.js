@@ -113,6 +113,20 @@ exports.getClientProposals = (req, res) => {
         title: 'Review Client Proposals'
     });
 };
+//This is the public view of currently approved projects
+/**
+ * GET /account/approvedProjectsPublicView
+ * Display all approved client projects
+ */
+exports.getApprovedProjectsPublicView = (req, res) => {
+    Client.find({isDecided: true, isApproved: true, isDeleted: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.render('account/approvedProjectsPublicView', {
+            title: 'Approved Client Projects',
+            clients: Clients
+        });
+    });
+};
 //The following three GET requests are dynamic content populated in client-proposals
 /**
  * GET /instructor/pendingProjects

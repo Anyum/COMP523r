@@ -40,13 +40,14 @@ block content
                 |  deleted client requests
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
+                a.btn.btn-default(href='/approved', role='button', target='_blank') Open Public Approved View »
     hr
     .row
         h2 Manage Client Emails
         p Send emails to approved, pending, or rejected clients.
-        p (Time selection link: https://comp523.cloudapps.unc.edu/client/client-times)
         p
             a.btn.btn-default(href='/instructor/email-clients', role='button') View details »
+            a.btn.btn-default(href='/client/client-times', role='button', target='_blank') Open Client Presentation Time Selection Link »
     hr
     .row
         h2 Manage Client Presentations
@@ -69,10 +70,9 @@ block content
     .row
         h2 Manage email templates
         p Click here to assign students to accepted clients
-            .col-sm-2
-                a.btn.btn-default(href='/instructor/add-template', role='button') Add a template »
-            .col-sm-2
-                a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
+        p
+            a.btn.btn-default(href='/instructor/add-template', role='button') Add a template »
+            a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
     hr
 
 

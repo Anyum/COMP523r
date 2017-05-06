@@ -7,6 +7,11 @@ block content
     button.approved.btn.btn-success.btn-sm(type='button') Approved
     button.rejected.btn.btn-warning.btn-sm(type='button') Rejected
     button.deleted.btn.btn-danger.btn-sm(type='button') Deleted
+    p
+    p(style=" color: #5bc0de") Pending - Use for current semester pending projects (new proposals are automatically queued here)
+    p(style=" color: #5cb85c") Approved - Use for current semester approved projects (public approved project link draws from the data queued here)
+    p(style=" color: #FF8000") Rejected - Use for current semester rejected projects, or a place for previous semester restored projects that have potential
+    p(style=" color: #FF0000") Deleted - Use to store proposals in the database that you do not want to consider. You can restore any of these to Pending for reconsideration.
     #dynamic
     //Dynamically populate based on selected type of proposal, with pending as default
     script

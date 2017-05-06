@@ -30,10 +30,15 @@ if clients
                 |  #{client.term}
             .panel-footer
                 .row
-                    .col-xs-6
+                    .col-md-3
                         strong Current Status:
                         |  #{client.status}
-                    .col-xs-6
+                    .col-md-9
+                        form(method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='clientID', value= client._id)
+                            input(type='hidden', name='Decision', value= 'Pending')
+                            button.btn.btn-primary.btn-sm.pull-right(type='submit', value='Pending') Move Rejected Request to Pending List
                         form(method='POST')
                             input(type='hidden', name='_csrf', value=_csrf)
                             input(type='hidden', name='clientID', value= client._id)
