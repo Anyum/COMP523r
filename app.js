@@ -145,6 +145,12 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
+/**
+ * Public routes
+ */
+// This shows the public the currently approved projects
+app.get('/approved', instructorController.getApprovedProjectsPublicView);
 /**
  * Instructor routes
  */
