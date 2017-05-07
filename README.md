@@ -292,7 +292,6 @@ User.aggregate({ $group: { _id: null, total: { $sum: '$votes' } } }, (err, votes
   console.log(votesCount.total);
 });
 ```
-:top: <sub>[**back to top**](#table-of-contents)</sub>
 
 License
 -------
