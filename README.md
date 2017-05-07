@@ -1,4 +1,5 @@
 COMP 523 Manager
+----------------
 Structure for app and this readme was adapted from [Hackathon Starter] (https://github.com/sahat/hackathon-starter)
 
 Getting Started
