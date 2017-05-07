@@ -21,23 +21,4 @@ $(document).ready(function() {
 
     // Place JavaScript code here...
 
-    $('#add-times-button').on("click", function(e) {
-        e.preventDefault();
-        $('#available option:selected').each(function() {
-            $('#added').append($(this));
-        });
-        $('#added option:contains("Chosen times will show up here...")').remove();
-    });
-
-    $('#remove-times-button').on("click", function(e) {
-        e.preventDefault();
-        $('#added option:selected').each(function() {
-            $('#available').append($(this));
-        });
-    });
-
-    $('#timeform').on("submit", function(e) {
-       $('#added option').prop('selected', true);
-    });
-
 });

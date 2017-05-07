@@ -2,6 +2,7 @@ const async = require('async');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const Client = require('../models/Client');
+const TimeList = require('../models/TimeList');
 
 /**
  * GET /client/information
@@ -67,11 +68,14 @@ exports.getClientFormSubmitted = (req, res) => {
  */
 exports.getClientTime = (req, res) => {
     Client.find({isDecided: true, isApproved: true}, (err, Clients) => {
-        // console.log(Clients);
         if (err) return handleError(err);
-        res.render('client/clientTimes', {
-            title: 'Time Selection',
-            clients: Clients
+        TimeList.findOne({current: true}, 'times', (err, result) => {
+            if (err) return handleError(err);
+            res.render('client/clientTimes', {
+                title: 'Time Selection',
+                clients: Clients,
+                timelist: result.times,
+            });
         });
     });
 };
@@ -82,19 +86,16 @@ exports.getClientTime = (req, res) => {
  */
 exports.postClientTime = (req, res, next) => {
     var query = {'name': req.body.name};
-    var update = { $set: {'selectedTimes': req.body.added, 'presentationNote': req.body.note}};
+    var update = { $set: {'selectedTimes': req.body.added, 'presentationNote': req.body.note, 'sentPitchSchedule': true}};
 
     Client.findOneAndUpdate(query, update, function(err, doc) {
-       if(err) req.flash('errors', err);
-       else {
-           // Client.findOne({'name': req.body.name}, 'selectedTimes', function(err, result) {
-           //    res.render('client/clientTimesSubmitted', {times: result});
-           // });
-           res.render('client/clientTimesSubmitted', {
-               title: 'Submission Successful',
-               times: req.body.added
-           });
-       }
+        if(err) req.flash('errors', err);
+        else {
+            res.render('client/clientTimesSubmitted', {
+                title: 'Submission Successful',
+                times: req.body.added
+            });
+        }
     });
 };
 

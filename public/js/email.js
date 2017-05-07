@@ -8,11 +8,11 @@ function createTemplateButtons(templates){
 }
 
 $(document).ready(function() {
-    //allRecipients is determined in step 1 based on category chosen
+    //allRecipients is determined in STEP 1 on the web page based on category of client chosen
     var allRecipients;
     var clientType;
     var templates;
-    //finalRecipients are the recipients selected in step 2
+    //finalRecipients are the recipients selected in STEP 2 on the web page.
     var senderName = "";
     var finalRecipients = [];
     var finalSubject;
@@ -63,17 +63,19 @@ $(document).ready(function() {
         });
     });
 
-    //add clients to finalRecipients on click
+    //add or remove clients to finalRecipients on click
     $("#clientSelection").on('click', '.checkbox', function(){
         var id = this.id;
         for (var i = 0; i < allRecipients.length; i++) {
             if (id == allRecipients[i]._id) {
                 if ($(this).is(':checked')) {
+                    //box was checked. add to the finalRecipients
                     finalRecipients.push(allRecipients[i]);
                 } else {
+                    //box was unchecked. remove from the finalRecipients
                     for (var j = finalRecipients.length - 1; j>=0; j--) {
                         if (id == finalRecipients[j]._id) {
-                            finalRecipients.splice(i,1);
+                            finalRecipients.splice(j,1);
                             return;
                         }
                     }
@@ -101,6 +103,8 @@ $(document).ready(function() {
         }
     });
 
+    // append the json to a hidden field so that it is submitted with the form submission.
+    // There may be a more direct way to do this?
     $("#email-form").submit(function(event) {
         finalSubject = $("#subject").val();
         finalBody = $("#message").val();
@@ -111,6 +115,7 @@ $(document).ready(function() {
         return true;
     });
 
+    //Generate the HTML for the progress tracker table. Right now, you would manually change this to add new columns
     function getClientHTML() {
         var html = "" +
             "<h3>Select " + clientType + " clients</h3>" +

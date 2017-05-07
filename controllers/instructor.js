@@ -5,19 +5,44 @@ const nodemailer = require('nodemailer');
 const Students = require('../models/Student');
 const TimeList = require('../models/TimeList');
 const xoauth2 = require('xoauth2');
+const GeneratedTeams = require('../models/GeneratedTeams');
+const Credential = require('../models/Credential');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         xoauth2: xoauth2.createXOAuth2Generator({
             type: 'OAuth2',
-            user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
-            clientId: process.env.GMAIL_CLIENT_ID || '894458215286-knid5sq8k9hpp2mjcis72sonkjg66fsc.apps.googleusercontent.com',
-            clientSecret: process.env.GMAIL_CLIENT_SECRET || 'NIC_pTikyBFh59xa2kAeFOGH',
-            refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/0-kxyqBHlehh01wQW3-_GdhBKTjnoSv6E-meayhUaVogg0btU2Pp3o5Mr8lPjuyG'
+            user: "",
+            clientId: "",
+            clientSecret: "",
+            refreshToken: ""
         })
     }
 });
+
+
+function updateTransporter() {
+    Credential.findOne({}, (err, credential) => {
+        if (err) return;
+        if (credential) {
+            transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    xoauth2: xoauth2.createXOAuth2Generator({
+                        type: 'OAuth2',
+                        user: credential.emailAddress,
+                        clientId: credential.clientID,
+                        clientSecret: credential.clientSecret,
+                        refreshToken: credential.refreshToken
+                    })
+                }
+            });
+        }
+    });
+}
+//Always run at startup
+updateTransporter();
 
 /**
  * GET /
@@ -25,9 +50,9 @@ var transporter = nodemailer.createTransport({
  */
 exports.getDashboard = (req, res) => {
     var locals = {};
-    // process all 3 queries in parallel
+    // process all 5 queries in parallel
     // all queries return a `callback` when complete
-    // waits for all 3 callbacks to process asynchronously, then proceeds
+    // waits for all 5 callbacks to process asynchronously, then proceeds
     async.parallel([
         // Undecided client proposals
         function(callback) {
@@ -60,8 +85,21 @@ exports.getDashboard = (req, res) => {
                 locals.deleted = count;
                 callback();
             });
+        },
+        // List of all schedule and current schedule
+        function(callback) {
+            TimeList.find({}, (err, result) => {
+                if (err) return callback(err);
+                locals.schedules = result;
+                locals.currentSchedule = [];
+                result.forEach(function(x) {
+                    if (x.current)
+                        locals.currentSchedule.push(x);
+                });
+                callback();
+            });
         }
-    ], function(err) { //This function gets called after the three tasks have called their "task callbacks"
+    ], function(err) { //This function gets called after the five tasks have called their "task callbacks"
         if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
         //Here `locals` will be an object with `undecided`, `rejected` and `approved` keys
         res.render('instructor/instructorDashboard', {
@@ -69,7 +107,23 @@ exports.getDashboard = (req, res) => {
             pendingClientRequests: locals.undecided,
             rejectedClientRequests: locals.rejected,
             approvedClientRequests: locals.approved,
-            deletedClientRequests: locals.deleted
+            deletedClientRequests: locals.deleted,
+            schedules: locals.schedules,
+            current: locals.currentSchedule,
+        });
+    });
+};
+
+/**
+ * POST /
+ * This is only for settling multiple schedule conflicts
+ */
+exports.postDashboard = (req, res) => {
+    TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
+        if (err) return handleError(err);
+        TimeList.findOneAndUpdate({name: req.body.chosenschedule}, {$set: {current: true}}, function(err, x) {
+            if (err) return handleError(err);
+            res.redirect('back');
         });
     });
 };
@@ -81,6 +135,20 @@ exports.getDashboard = (req, res) => {
 exports.getClientProposals = (req, res) => {
     res.render('instructor/instructorClientProposals',{
         title: 'Review Client Proposals'
+    });
+};
+//This is the public view of currently approved projects
+/**
+ * GET /account/approvedProjectsPublicView
+ * Display all approved client projects
+ */
+exports.getApprovedProjectsPublicView = (req, res) => {
+    Client.find({isDecided: true, isApproved: true, isDeleted: false}, (err, Clients) => {
+        if (err) return handleError(err);
+        res.render('account/approvedProjectsPublicView', {
+            title: 'Approved Client Projects',
+            clients: Clients
+        });
     });
 };
 //The following three GET requests are dynamic content populated in client-proposals
@@ -409,7 +477,7 @@ exports.postModifyTemplates= (req, res) => {
  * View the times that clients that selected, and be able to automatically assign final presentation times
  */
 exports.getClientTimes = (req, res) => {
-    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}, (err, result) => {
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}, {selectedTimes: {$not: {$size: 0}}}]}, (err, result) => {
        if (err) return handleError(err);
        res.render('instructor/instructorClientTimes', {
           title: 'Client Time Preferences',
@@ -427,7 +495,7 @@ exports.getAssignSuccess = (req, res) => {
     var times = new Array();
     var messages = new Array();
 
-    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}]}).sort({'updatedAt': 'desc'}).exec().then(function(result) {
+    Client.find({ $and: [{selectedTimes: { $exists: true}}, {selectedTimes: { $ne: null}}, {selectedTimes: {$not: {$size: 0}}}]}).sort({'updatedAt': 'desc'}).exec().then(function(result) {
 
         // Storing clients in an array
         result.forEach(function(x) {
@@ -447,6 +515,16 @@ exports.getAssignSuccess = (req, res) => {
     }).then(function(result) {
 
         // Assigning presentation times
+        /**
+         * The algorithm for assigning times to clients is as follows:
+         *      For each time, produce a list of clients who have selected that time.
+         *
+         *      Of those clients, assign the time to the client who had selected the LEAST
+         *      number of total time slots.
+         *
+         *      If more than one client ties for least number of slots, assign the time to
+         *      the client who had completed the form the EARLIEST.
+         */
         for (var i=0; i<times.length; i++) {
             var y = new Array();
             var low = 1000;
@@ -484,7 +562,55 @@ exports.getAssignSuccess = (req, res) => {
         res.render('instructor/instructorAssignSuccess', {
             title: 'Results',
             clients: result,
-            messages: messages
+            messages: messages,
+            times: times
+        });
+    });
+};
+
+/**
+ * GET /instructor/schedule-edit
+ * Edit or create new schedules (TimeList)
+ */
+
+exports.getScheduleEdit = (req, res) => {
+    TimeList.findOne({'current': true}, function(err, list) {
+        if (err) return handleError(err);
+        var times, name;
+        if (list) {
+            name = list.name;
+            times = list.times.join('\n');
+        } else {
+            name = '';
+            times = [];
+        }
+        res.render('instructor/scheduleEdit', {
+            title: 'Schedule Edit',
+            name: name,
+            schedule: times
+        });
+    });
+};
+
+/**
+ * POST /instructor/schedule-edit
+ * Save new or updated schedule (TimeList)
+ */
+exports.postScheduleEdit = (req, res) => {
+    var times = req.body.times.split(/\r\n|\r|\n/g);
+    var makeCurrent;
+    if (req.body.active == 'Yes')
+        makeCurrent = true;
+    else
+        makeCurrent = false;
+    TimeList.update({current: true}, {$set: {current: false}}, {multi: true}, function(err, result) {
+        if (err) return handleError(err);
+        TimeList.findOneAndUpdate({'name': req.body.name}, {$set: {'times': times, 'current': makeCurrent}}, {'upsert': true}, function(err, result) {
+            if (err) return handleError(err);
+            res.render('instructor/scheduleSuccess', {
+                title: 'Success',
+                times: times
+            });
         });
     });
 };
@@ -507,13 +633,204 @@ exports.getSubmittedTeams = (req, res) => {
  * Allows you to generate-final-teams
  */
 exports.getGeneratedTeams = (req, res) => {
-    Students.find({}, (err, Students) => {
-        if (err) return handleError(err);
-    res.render('instructor/generatedTeams', {
-        title: 'Generated Teams of 4',
-        studentTeams: Students
+
+    var t4 = new Array();
+    var t3 = new Array();
+    var t2 = new Array();
+    var t1 = new Array();
+    var unassigned_student_names = new Array;
+    var canGenerateMapping = false;
+
+    Students.find({}).then(function(result) {
+
+        result.forEach(function(x) {
+
+            if(x.numStudents==4){
+                t4.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "student3": x.student3,
+                    "student4": x.student4,
+                    "preferenceList": x.preferenceList
+                });
+            } else if(x.numStudents == 3){
+                t3.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "student3": x.student3,
+                    "preferenceList": x.preferenceList
+                });
+            } else if(x.numStudents == 2){
+                t2.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "student2": x.student2,
+                    "preferenceList": x.preferenceList
+                });
+            } else {
+                t1.push({
+                    "numStudents": x.numStudents,
+                    "student1": x.student1,
+                    "preferenceList": x.preferenceList
+                });
+            }
+
+        });
+
+        //making teams of 3 into teams of 4
+        while(t3.length!=0){
+            if(t1.length!=0){ //combining teams of 1 to teams of 3 if possible
+                var popped3 = t3.pop();
+                var popped1 = t1.pop();
+                t4.push({
+                    "numStudents": popped3.numStudents+":"+popped1.numStudents,
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "student3": popped3.student3,
+                    "student4": popped1.student1,
+                    "preferenceList": popped3.preferenceList
+                });
+            }else if(t2.length!=0){ //breaking up teams of 2 to make teams of 3 into teams of 4
+                var popped3 = t3.pop();
+                var popped2 = t2.pop();
+                t4.push({
+                    "numStudents": popped3.numStudents+":"+popped2.numStudents+"(s1)",
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "student3": popped3.student3,
+                    "student4": popped2.student1,
+                    "preferenceList": popped3.preferenceList
+                });
+                t1.push({
+                    "numStudents": popped2.numStudents+"(s2)",
+                    "student1": popped2.student2,
+                    "preferenceList": popped2.preferenceList
+                });
+            }else{ //break teams of 3 since those are the only teams left if this else is ever excuted
+                var popped3 = t3.pop();
+                t2.push({ //putting s1, s2 of the popped t3 into t2
+                    "numStudents": popped3.numStudents+"(s1,s2)",
+                    "student1": popped3.student1,
+                    "student2": popped3.student2,
+                    "preferenceList": popped3.preferenceList
+                });
+                t1.push({ //pushing s3 of the popped t3 into t1
+                    "numStudents": popped3.numStudents+"(s3)",
+                    "student1": popped3.student3,
+                    "preferenceList": popped3.preferenceList
+                });
+            }
+        }
+        while(t2.length!=0){
+            if(t2.length>1){ //if you have more than 1 team of two then compbine teams of 2 to make teams of 4
+                var popped2_1 = t2.pop();
+                var popped2_2 = t2.pop();
+                t4.push({
+                    "numStudents": popped2_1.numStudents+":"+popped2_2.numStudents,
+                    "student1": popped2_1.student1,
+                    "student2": popped2_1.student2,
+                    "student3": popped2_2.student1,
+                    "student4": popped2_2.student2,
+                    "preferenceList": popped2_1.preferenceList
+                });
+            }else if(t1.length>1){ //have at least 2 teams of one
+                var popped2 = t2.pop();
+                var popped1_1 = t1.pop();
+                var popped1_2 = t1.pop();
+                t4.push({
+                    "numStudents": popped2.numStudents+":"+popped1_1.numStudents+":"+popped1_2.numStudents,
+                    "student1": popped2.student1,
+                    "student2": popped2.student2,
+                    "student3": popped1_1.student1,
+                    "student4": popped1_2.student1,
+                    "preferenceList": popped2.preferenceList
+                });
+            }
+            else { //you have only one team of 2 left so we break it into teams of 1
+                var popped2 = t2.pop();
+                t1.push({
+                    "numStudents": popped2.numStudents + "(s1)",
+                    "student1": popped2.student1,
+                    "preferenceList": popped2.preferenceList
+                });
+                t1.push({
+                    "numStudents": popped2.numStudents + "(s2)",
+                    "student1": popped2.student2,
+                    "preferenceList": popped2.preferenceList
+                });
+            }
+        }
+        while(t1.length!=0){
+            if(t1.length>3){
+                var popped1_1= t1.pop();
+                var popped1_2= t1.pop();
+                var popped1_3= t1.pop();
+                var popped1_4= t1.pop();
+                t4.push({
+                    "numStudents": popped1_1.numStudents+":"+popped1_2.numStudents+":"+popped1_3.numStudents+":"+popped1_4.numStudents,
+                    "student1": popped1_1.student1,
+                    "student2": popped1_2.student1,
+                    "student3": popped1_3.student1,
+                    "student4": popped1_4.student1,
+                    "preferenceList": popped1_1.preferenceList
+                });
+            }else{
+                while(t1.length!=0){
+                    unassigned_student_names.push(t1.pop().student1);
+                }
+            }
+        }
+
+
+
+        function removeTeams(callback) {
+            GeneratedTeams.remove({},function(err, removed){
+            });
+
+        }
+
+
+        operations = [];
+
+        function addTeam(index) {
+            t4[index].teamNumber = index;
+            const generatedTeam = new GeneratedTeams({
+                teamNumber: index,
+                assignedProject: "unassigned",
+                numStudents: t4[index].numStudents,
+                student1: t4[index].student1,
+                student2: t4[index].student2,
+                student3: t4[index].student3,
+                student4: t4[index].student4,
+                preferenceList: t4[index].preferenceList
+            });
+            generatedTeam.save();
+        }
+
+        operations.push(removeTeams);
+        for (var i = 0; i < t4.length; i++) {
+            operations.push(addTeam(i));
+        }
+
+        async.series(operations, function (err, results) {
+
+        });
+
+        if(t4.length==12){
+            canGenerateMapping = true;
+        }
+
+    }).then(function() {
+
+        res.render('instructor/generatedTeams', {
+            title: 'Generated Teams of 4',
+            generatedTeams: t4,
+            unassigned_student_names: unassigned_student_names,
+            canGenerateMapping: canGenerateMapping
+        });
     });
-});
 };
 
 /**
@@ -521,12 +838,179 @@ exports.getGeneratedTeams = (req, res) => {
  * Allows you to compute-team-mapping-to-projects
  */
 exports.getTeamMappingToProjects = (req, res) => {
-    Students.find({}, (err, Students) => {
-        if (err) return handleError(err);
-    res.render('instructor/teamMappingToProjects', {
-        title: 'Team Mapping To Projects',
-        studentTeams: Students,
-        projects: [1,2,3,4,5,6,7,8,9,10,11,12]
+
+    var numTeams = 12;
+    var pRankList = new Array(numTeams);  //randomizing project rank order of teams
+
+    /*pRankList[0]=[1, 3, 2, 0];    //test configeration
+    pRankList[1]=[2, 0, 3, 1];
+    pRankList[2]=[1, 2, 3, 0];
+    pRankList[3]=[0, 1, 3, 2];*/
+
+    for(var i=0; i<numTeams; i++){ //randomizing project rank order of teams
+        var randArr = new Array();
+        for(var j=0; j<numTeams; j++){
+            randArr.push(j);
+        }
+        for (var j=0; j<numTeams; j++){
+            var rand = Math.floor(Math.random() * numTeams);
+            var temp = randArr[j];
+            randArr[j] = randArr[rand];
+            randArr[rand] = temp;
+        }
+
+        pRankList[i]=randArr;
+
+        /*var s = "[";
+        for(var j=0; j<numTeams; j++){
+            s+=randArr[j]+", ";
+        }
+        console.log(s);*/
+    }
+
+    var tRankList = new Array(numTeams);  //will contain team rank order of projects
+
+    var tFree = new Array();    //will contain free teams
+    var pPariedTo = new Array();   //will contain paring of projects to teams (index= project, value=team#) -1 means project is free
+
+    for(var i=0; i<numTeams; i++){ //initalizing all teams to be free and project paring to be free
+        tFree.push(i);
+        pPariedTo.push(-1); //-1 means the project is free
+    }
+
+    var finalMapping = new Array();
+
+    GeneratedTeams.find({}).then(function(result) {
+
+        result.forEach(function(x){ //building up team preference list in reverse order to take advantage of pop function later on
+            var i = parseInt(x.teamNumber);
+            //console.log(i);
+            tRankList[i] = new Array();
+            for(var j=0; j<numTeams; j++){
+                tRankList[i][numTeams-j-1] = x.preferenceList.charCodeAt((j*2)) - 97;
+                //console.log(tRankList[i][numTeams-j-1]);
+            }
+        });
+
+        while(tFree.length!=0){ //while there are free teams map the teams
+            for(var i=0;i<tFree.length;i++){ //going through all the free teams
+                var currTeamNumber = tFree[i];
+                var currTeamsNextPreference = tRankList[currTeamNumber].pop();  //getting the next preference
+                //var isNextPreferenceFree = false;
+                var nextPreferenceIsPairedTo = pPariedTo[currTeamsNextPreference];  //getting who the preference is paired to
+
+                if(nextPreferenceIsPairedTo==-1){ // next preferenc is not paired
+                    pPariedTo[currTeamsNextPreference] = currTeamNumber;  //updating pPairedTo include new pairing
+                    tFree.splice(i,1); //removing team i from free teams
+                }else{
+                    var nextPreferencesRankList = pRankList[currTeamsNextPreference];
+                    if(nextPreferencesRankList.indexOf(nextPreferenceIsPairedTo)>nextPreferencesRankList.indexOf(currTeamNumber)){
+                        tFree[i] = nextPreferenceIsPairedTo;
+                        pPariedTo[currTeamsNextPreference] = currTeamNumber;
+                    }
+
+                }
+
+            }
+        }
+
+        for(var i=0; i<pPariedTo.length; i++){
+            finalMapping[i] = "Project " + String.fromCharCode(97 + i) + " is assigned to team "+ pPariedTo[i];
+        }
+
+
+        res.render('instructor/teamMappingToProjects', {
+            title: 'Team Mapping To Projects',
+            finalMapping: finalMapping
+        });
     });
-});
+};
+
+/**
+ * GET /instructor/email-authentication
+ * Submit your GMail OAuth2 credentials
+ */
+exports.getEmailAuthentication = (req, res) => {
+    res.render('instructor/addEmailAuthentication',{
+        title: 'Submit OAuth2 email credentials'
+    });
+};
+/**
+ * POST /instructor/email-authentication
+ * Add the credentials to the database
+ */
+exports.postEmailAuthentication = (req, res) => {
+
+    const credential = new Credential({
+        //There will only ever be one credential. So set its id to 1
+        emailAddress: req.body.emailAddress,
+        clientID: req.body.clientID,
+        clientSecret: req.body.clientSecret,
+        refreshToken: req.body.refreshToken
+    });
+
+    //perform the following mongoose queries in series
+    async.series([
+        // Empty the credential collection
+        function(callback) {
+            Credential.remove({}, (err, credentials) => {
+                if (err) return callback(err);
+                callback();
+            });
+        },
+        // Add in your credential
+        function(callback) {
+            credential.save((err) => {
+                if (err) return callback(err);
+                callback();
+            });
+        },
+        // make sure that the transporter is up-to-date
+        function(callback) {
+            updateTransporter();
+            callback();
+        },
+    ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
+        if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
+        res.redirect('/instructor/test-authentication');
+    });
+};
+/**
+ * GET /instructor/test-authentication
+ * Allows you to view current GMail OAuth2 credentials, and show test results
+ */
+exports.getTestAuthentication = (req, res) => {
+    var testingResult = "";
+
+    //perform the following functions in series
+    async.series([
+        // make sure that the transporter is up-to-date
+        function(callback) {
+            updateTransporter();
+            callback();
+        },
+        // Test the connection
+        function(callback) {
+            transporter.verify(function(error, success) {
+                if (error) {
+                    testingResult = error;
+                    console.log(error);
+                } else {
+                    testingResult = 'Server is ready to take our messages';
+                    console.log(testingResult);
+                }
+                callback();
+            });
+        },
+    ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
+        if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
+        Credential.findOne({}, (err, credential) => {
+            if (err) return handleError(err);
+            res.render('instructor/testEmailAuthentication', {
+                title: 'Test Email Authentication',
+                credential: credential,
+                testingResult: testingResult
+            });
+        });
+    });
 };

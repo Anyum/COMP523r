@@ -3,10 +3,7 @@ extends ../layout
 block content
     .page-header
         h3 Team Mapping To Projects
-    if studentTeams
-        each team in studentTeams
-            hr
+    if finalMapping
+        each mapping in finalMapping
             .row
-                p Group Size: #{team.numStudents}
-                p Group Members: #{team.student1}, #{team.student2}, #{team.student3}, #{team.student4}
-                p Project Preferences: #{team.preferenceList}
+                p #{mapping}

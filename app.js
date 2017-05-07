@@ -145,11 +145,18 @@ app.post('/account/profile', passportConfig.isAuthenticated, userController.post
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
+
+/**
+ * Public routes
+ */
+// This shows the public the currently approved projects
+app.get('/approved', instructorController.getApprovedProjectsPublicView);
 /**
  * Instructor routes
  */
 // check if they are logged in, then check if they are an instructor, only then let them get the page
 app.get('/instructor',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDashboard);
+app.post('/instructor', passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postDashboard);
 app.get('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientProposals);
 app.post('/instructor/client-proposals',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postClientProposals);
 app.get('/instructor/email-clients',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailClients);
@@ -162,7 +169,12 @@ app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportCon
 app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
 app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
 
-//Email Templates
+// Google OAuth2
+app.get('/instructor/email-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailAuthentication);
+app.post('/instructor/email-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailAuthentication);
+app.get('/instructor/test-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getTestAuthentication);
+
+// Email Templates
 app.get('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAddTemplate);
 app.post('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postAddTemplate);
 app.get('/instructor/modify-templates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getModifyTemplates);
@@ -178,6 +190,8 @@ app.get('/api/emailTemplates',passportConfig.isAuthenticated,passportConfig.isIn
 // Client time management
 app.get('/instructor/client-chosen-times',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getClientTimes);
 app.get('/instructor/assign-success',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAssignSuccess);
+app.get('/instructor/schedule-edit',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getScheduleEdit);
+app.post('/instructor/schedule-edit',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postScheduleEdit);
 
 // Student team stuff
 app.get('/instructor/view-student-submitted-teams',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getSubmittedTeams);

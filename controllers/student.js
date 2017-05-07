@@ -17,6 +17,7 @@ exports.postStudentForm = (req, res, next) => {
     req.check('numStudents', 'Group Size field is empty or not a number').notEmpty().isInt();
     req.check('student1', 'Student 1 Name is either empty or not Alpha').notEmpty().isAlpha();
     req.check('preferenceList', 'Project Preferences field is empty').notEmpty();
+    req.check('preferenceList', 'You need to enter 12 comma-separated letters for project preferences').len(23,23);
 
     errors = req.validationErrors();
 
@@ -41,6 +42,17 @@ exports.postStudentForm = (req, res, next) => {
         errors=[{msg: "Group size can only be 1 to 4"}];
     }
 
+    var projLetters = req.body.preferenceList.toLowerCase().split(',');
+    //console.log(projLetters.length);
+    if (projLetters.length != 12) {
+        errors=[{msg: "Make sure you entered 12 comma-separated letters (i.e: a,b,c,d,e...) for project preferences"}];
+    }
+
+    for(var x=0; x<12; x++){
+        if( projLetters.indexOf(String.fromCharCode(97 + x)) == -1){
+            errors=[{msg: "Make sure your preferences include all letters a-l and that each one is only selected once."}];
+        }
+    }
 
     if (errors) {
         req.flash('errors', errors);
@@ -53,7 +65,7 @@ exports.postStudentForm = (req, res, next) => {
         student2: req.body.student2,
         student3: req.body.student3,
         student4: req.body.student4,
-        preferenceList: req.body.preferenceList
+        preferenceList: req.body.preferenceList.toLowerCase()
     });
 
     student.save((err) => {
