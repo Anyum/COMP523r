@@ -54,10 +54,11 @@ block content
     hr.divider
     .row
         h2 Manage Client Emails
-        p Send emails to approved, pending, or rejected clients.
+        p Send emails to approved, pending, or rejected clients. Keep track of what emails have been sent.
         p
-            a.btn.btn-default(href='/instructor/email-clients', role='button') View details »
-            a.btn.btn-default(href='/client/client-times', role='button', target='_blank') Open Client Presentation Time Selection Link »
+            a.btn.btn-default(href='/instructor/email-clients', role='button') Send/Manage Emails »
+            a.btn.btn-default(href='/instructor/email-authentication', role='button') Submit Google OAuth2 Credentials »
+            a.btn.btn-default(href='/instructor/test-authentication', role='button') Test current OAuth2 credentials »
     hr.divider
     .row
         h2 Manage email templates
@@ -71,6 +72,7 @@ block content
         p See when clients want to present, and generate a final schedule
         p
             a.btn.btn-default(href='/instructor/client-chosen-times', role='button') View details »
+            a.btn.btn-default(href='/client/client-times', role='button', target='_blank') Client's Presentation Time Selection »
     hr.divider
     .row
         h2 Student Team Management

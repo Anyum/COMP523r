@@ -169,7 +169,12 @@ app.get('/instructor/pendingProjects',passportConfig.isAuthenticated,passportCon
 app.get('/instructor/rejectedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getRejectedProjects);
 app.get('/instructor/deletedProjects',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getDeletedProjects);
 
-//Email Templates
+// Google OAuth2
+app.get('/instructor/email-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getEmailAuthentication);
+app.post('/instructor/email-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postEmailAuthentication);
+app.get('/instructor/test-authentication',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getTestAuthentication);
+
+// Email Templates
 app.get('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getAddTemplate);
 app.post('/instructor/add-template',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.postAddTemplate);
 app.get('/instructor/modify-templates',passportConfig.isAuthenticated,passportConfig.isInstructor, instructorController.getModifyTemplates);

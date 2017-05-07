@@ -6,19 +6,38 @@ const Students = require('../models/Student');
 const TimeList = require('../models/TimeList');
 const xoauth2 = require('xoauth2');
 const GeneratedTeams = require('../models/GeneratedTeams');
+const Credential = require('../models/Credential');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         xoauth2: xoauth2.createXOAuth2Generator({
             type: 'OAuth2',
-            user: process.env.GMAIL_USER || 'ChrisBrajer@gmail.com',
-            clientId: process.env.GMAIL_CLIENT_ID || '894458215286-knid5sq8k9hpp2mjcis72sonkjg66fsc.apps.googleusercontent.com',
-            clientSecret: process.env.GMAIL_CLIENT_SECRET || 'NIC_pTikyBFh59xa2kAeFOGH',
-            refreshToken: process.env.GMAIL_REFRESH_TOKEN || '1/0-kxyqBHlehh01wQW3-_GdhBKTjnoSv6E-meayhUaVogg0btU2Pp3o5Mr8lPjuyG'
+            user: "",
+            clientId: "",
+            clientSecret: "",
+            refreshToken: ""
         })
     }
 });
+
+
+function updateTransporter() {
+    Credential.findOne({}, (err, credential) => {
+        if (err) return;
+        transporter.transporter.options.auth.xoauth2.options.user = credential.emailAddress;
+        transporter._options.auth.xoauth2.options.user = credential.emailAddress;
+        transporter.transporter.options.auth.xoauth2.options.clientId = credential.clientID;
+        transporter._options.auth.xoauth2.options.clientId = credential.clientID;
+        transporter.transporter.options.auth.xoauth2.options.clientSecret = credential.clientSecret;
+        transporter._options.auth.xoauth2.options.clientSecret = credential.clientSecret;
+        transporter.transporter.options.auth.xoauth2.options.refreshToken = credential.refreshToken;
+        transporter._options.auth.xoauth2.options.refreshToken = credential.refreshToken;
+    });
+
+}
+//Always run at startup
+updateTransporter();
 
 /**
  * GET /
@@ -898,6 +917,95 @@ exports.getTeamMappingToProjects = (req, res) => {
         res.render('instructor/teamMappingToProjects', {
             title: 'Team Mapping To Projects',
             finalMapping: finalMapping
+        });
+    });
+};
+
+/**
+ * GET /instructor/email-authentication
+ * Submit your GMail OAuth2 credentials
+ */
+exports.getEmailAuthentication = (req, res) => {
+    res.render('instructor/addEmailAuthentication',{
+        title: 'Submit OAuth2 email credentials'
+    });
+};
+/**
+ * POST /instructor/email-authentication
+ * Add the credentials to the database
+ */
+exports.postEmailAuthentication = (req, res) => {
+
+    const credential = new Credential({
+        //There will only ever be one credential. So set its id to 1
+        emailAddress: req.body.emailAddress,
+        clientID: req.body.clientID,
+        clientSecret: req.body.clientSecret,
+        refreshToken: req.body.refreshToken
+    });
+
+    //perform the following mongoose queries in series
+    async.series([
+        // Empty the credential collection
+        function(callback) {
+            Credential.remove({}, (err, credentials) => {
+                if (err) return callback(err);
+                callback();
+            });
+        },
+        // Add in your credential
+        function(callback) {
+            credential.save((err) => {
+                if (err) return callback(err);
+                callback();
+            });
+        },
+        // make sure that the transporter is up-to-date
+        function(callback) {
+            updateTransporter();
+            callback();
+        },
+    ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
+        if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
+        res.redirect('/instructor/test-authentication');
+    });
+};
+/**
+ * GET /instructor/test-authentication
+ * Allows you to view current GMail OAuth2 credentials, and show test results
+ */
+exports.getTestAuthentication = (req, res) => {
+    var testingResult = "";
+
+    //perform the following functions in series
+    async.series([
+        // make sure that the transporter is up-to-date
+        function(callback) {
+            updateTransporter();
+            callback();
+        },
+        // Test the connection
+        function(callback) {
+            transporter.verify(function(error, success) {
+                if (error) {
+                    testingResult = error;
+                    console.log(error);
+                } else {
+                    testingResult = 'Server is ready to take our messages';
+                    console.log(testingResult);
+                }
+                callback();
+            });
+        },
+    ], function(err) { //This function gets called after the two tasks have called their "task callbacks"
+        if (err) return next(err); //If an error occurred, we let express handle it by calling the `next` function
+        Credential.findOne({}, (err, credential) => {
+            if (err) return handleError(err);
+            res.render('instructor/testEmailAuthentication', {
+                title: 'Test Email Authentication',
+                credential: credential,
+                testingResult: testingResult
+            });
         });
     });
 };
