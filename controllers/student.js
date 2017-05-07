@@ -1,4 +1,6 @@
 const Student = require('../models/Student');
+const numTeamsOf4 = 12;  // change this number to the number of desired student teams and number of corresponding projects
+
 
 exports.getStudentForm = (req, res) => {
     res.render('student/studentForm', {
@@ -17,7 +19,7 @@ exports.postStudentForm = (req, res, next) => {
     req.check('numStudents', 'Group Size field is empty or not a number').notEmpty().isInt();
     req.check('student1', 'Student 1 Name is either empty or not Alpha').notEmpty().isAlpha();
     req.check('preferenceList', 'Project Preferences field is empty').notEmpty();
-    req.check('preferenceList', 'You need to enter 12 comma-separated letters for project preferences').len(23,23);
+    req.check('preferenceList', 'You need to enter '+numTeamsOf4+' comma-separated letters for project preferences').len(numTeamsOf4*2-1,numTeamsOf4*2-1);
 
     errors = req.validationErrors();
 
@@ -44,13 +46,18 @@ exports.postStudentForm = (req, res, next) => {
 
     var projLetters = req.body.preferenceList.toLowerCase().split(',');
     //console.log(projLetters.length);
-    if (projLetters.length != 12) {
-        errors=[{msg: "Make sure you entered 12 comma-separated letters (i.e: a,b,c,d,e...) for project preferences"}];
+    if (projLetters.length != numTeamsOf4) {
+        errors=[{msg: "Make sure you entered "+numTeamsOf4+" comma-separated letters (i.e: a,b,c,d,e...) for project preferences"}];
     }
 
-    for(var x=0; x<12; x++){
+    if (errors) {
+        req.flash('errors', errors);
+        return res.redirect('/student');
+    }
+
+    for(var x=0; x<numTeamsOf4; x++){
         if( projLetters.indexOf(String.fromCharCode(97 + x)) == -1){
-            errors=[{msg: "Make sure your preferences include all letters a-l and that each one is only selected once."}];
+            errors=[{msg: "Make sure your preferences include all letters a-"+String.fromCharCode(97 + numTeamsOf4-1)+" and that each one is only selected once."}];
         }
     }
 

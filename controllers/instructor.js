@@ -7,6 +7,7 @@ const TimeList = require('../models/TimeList');
 const xoauth2 = require('xoauth2');
 const GeneratedTeams = require('../models/GeneratedTeams');
 const Credential = require('../models/Credential');
+const numTeamsOf4 = 12;  // change this number to the number of desired student teams and number of corresponding projects
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -818,7 +819,7 @@ exports.getGeneratedTeams = (req, res) => {
 
         });
 
-        if(t4.length==12){
+        if(t4.length==numTeamsOf4){
             canGenerateMapping = true;
         }
 
@@ -828,7 +829,9 @@ exports.getGeneratedTeams = (req, res) => {
             title: 'Generated Teams of 4',
             generatedTeams: t4,
             unassigned_student_names: unassigned_student_names,
-            canGenerateMapping: canGenerateMapping
+            canGenerateMapping: canGenerateMapping,
+            numOfGeneratedTeams: t4.length,
+            numNeededTeams: numTeamsOf4
         });
     });
 };
@@ -839,7 +842,31 @@ exports.getGeneratedTeams = (req, res) => {
  */
 exports.getTeamMappingToProjects = (req, res) => {
 
-    var numTeams = 12;
+    /*
+    The Stable marriage Algorithm is used below to map the teams to projects.
+
+    Here is the basic algorithm:
+     function stableMatching {
+     Initialize all m ∈ M and w ∈ W to free
+     while ∃ free man m who still has a woman w to propose to {
+     w = first woman on m’s list to whom m has not yet proposed
+     if w is free
+     (m, w) become engaged
+     else some pair (m', w) already exists
+     if w prefers m to m'
+     m' becomes free
+     (m, w) become engaged
+     else
+     (m', w) remain engaged
+     }
+     }
+
+     in our implementation the set of student generated teams is the set M from the above algorithm and the set of projects
+     is the set W from the algorithm. Since projects don't have a preference list of student teams thus each project
+     preference list is randomely generated.
+    */
+
+    var numTeams = numTeamsOf4;
     var pRankList = new Array(numTeams);  //randomizing project rank order of teams
 
     /*pRankList[0]=[1, 3, 2, 0];    //test configeration
@@ -898,15 +925,16 @@ exports.getTeamMappingToProjects = (req, res) => {
                 var currTeamsNextPreference = tRankList[currTeamNumber].pop();  //getting the next preference
                 //var isNextPreferenceFree = false;
                 var nextPreferenceIsPairedTo = pPariedTo[currTeamsNextPreference];  //getting who the preference is paired to
+                //console.log(currTeamsNextPreference);
 
                 if(nextPreferenceIsPairedTo==-1){ // next preferenc is not paired
                     pPariedTo[currTeamsNextPreference] = currTeamNumber;  //updating pPairedTo include new pairing
                     tFree.splice(i,1); //removing team i from free teams
                 }else{
                     var nextPreferencesRankList = pRankList[currTeamsNextPreference];
-                    if(nextPreferencesRankList.indexOf(nextPreferenceIsPairedTo)>nextPreferencesRankList.indexOf(currTeamNumber)){
-                        tFree[i] = nextPreferenceIsPairedTo;
-                        pPariedTo[currTeamsNextPreference] = currTeamNumber;
+                    if(nextPreferencesRankList.indexOf(nextPreferenceIsPairedTo)>nextPreferencesRankList.indexOf(currTeamNumber)){ //if next preference prefers current team more than the team its paird to
+                        tFree[i] = nextPreferenceIsPairedTo;  // the paired team becomes free
+                        pPariedTo[currTeamsNextPreference] = currTeamNumber; //the current team is paired to this project
                     }
 
                 }
