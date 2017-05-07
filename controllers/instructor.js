@@ -9,6 +9,7 @@ const GeneratedTeams = require('../models/GeneratedTeams');
 const Credential = require('../models/Credential');
 const numTeamsOf4 = 12;  // change this number to the number of desired student teams and number of corresponding projects
 
+
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
