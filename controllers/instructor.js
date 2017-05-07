@@ -25,16 +25,21 @@ var transporter = nodemailer.createTransport({
 function updateTransporter() {
     Credential.findOne({}, (err, credential) => {
         if (err) return;
-        transporter.transporter.options.auth.xoauth2.options.user = credential.emailAddress;
-        transporter._options.auth.xoauth2.options.user = credential.emailAddress;
-        transporter.transporter.options.auth.xoauth2.options.clientId = credential.clientID;
-        transporter._options.auth.xoauth2.options.clientId = credential.clientID;
-        transporter.transporter.options.auth.xoauth2.options.clientSecret = credential.clientSecret;
-        transporter._options.auth.xoauth2.options.clientSecret = credential.clientSecret;
-        transporter.transporter.options.auth.xoauth2.options.refreshToken = credential.refreshToken;
-        transporter._options.auth.xoauth2.options.refreshToken = credential.refreshToken;
+        if (credential) {
+            transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    xoauth2: xoauth2.createXOAuth2Generator({
+                        type: 'OAuth2',
+                        user: credential.emailAddress,
+                        clientId: credential.clientID,
+                        clientSecret: credential.clientSecret,
+                        refreshToken: credential.refreshToken
+                    })
+                }
+            });
+        }
     });
-
 }
 //Always run at startup
 updateTransporter();
