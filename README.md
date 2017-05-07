@@ -1,4 +1,8 @@
-COMP 523 Manager
+COMP 523 Manager (A UNC COMP523 Class Manager)
+
+Designed by Grace Liu, Chris Brajer, Abby Schatzman, Abu Raja, and Nathan Owens
+
+Link to current site: https://comp523.cloudapps.unc.edu/
 ----------------
 Structure for app and this readme was adapted from [Hackathon Starter] (https://github.com/sahat/hackathon-starter)
 
