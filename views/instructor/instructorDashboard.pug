@@ -1,5 +1,15 @@
 extends ../layout
 
+block extraHeader
+    style.
+        .incomplete {
+            color: red;
+        }
+
+        hr.divider {
+            border: 1px solid lightgrey;
+        }
+
 block content
     h1 Instructor Dashboard
     p.lead Manage new client requests, create student teams, and manage student teams
@@ -41,40 +51,39 @@ block content
             p
                 a.btn.btn-default(href='/instructor/client-proposals', role='button') View details »
                 a.btn.btn-default(href='/approved', role='button', target='_blank') Open Public Approved View »
-    hr
+    hr.divider
     .row
         h2 Manage Client Emails
         p Send emails to approved, pending, or rejected clients.
         p
             a.btn.btn-default(href='/instructor/email-clients', role='button') View details »
             a.btn.btn-default(href='/client/client-times', role='button', target='_blank') Open Client Presentation Time Selection Link »
-    hr
+    hr.divider
+    .row
+        h2 Manage email templates
+        p Click here to create or modify pre-made email templates
+        p
+            a.btn.btn-default(href='/instructor/add-template', role='button') Add a template »
+            a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
+    hr.divider
     .row
         h2 Manage Client Presentations
         p See when clients want to present, and generate a final schedule
         p
             a.btn.btn-default(href='/instructor/client-chosen-times', role='button') View details »
-    hr
-    .row
-        h2 Manage Student Milestones
-        p View and track student-submitted milestones
-        p
-            a.btn.btn-default(href='#', role='button') View details »
-    hr
+    hr.divider
     .row
         h2 Student Team Management
         p Click here to view student submitted teams, finalize student teams and assign teams to accepted clients
         p
             a.btn.btn-default(href='/instructor/view-student-submitted-teams', role='button') View details »
-    hr
+    hr.divider
     .row
-        h2 Manage email templates
-        p Click here to assign students to accepted clients
+        h2.incomplete Manage Student Milestones
+        p View and track student-submitted milestones. Not implemented.
         p
-            a.btn.btn-default(href='/instructor/add-template', role='button') Add a template »
-            a.btn.btn-default(href='/instructor/modify-templates', role='button') Modify/Delete templates »
-    hr
-
+            a.btn.btn-default(href='#', role='button') View details »
+    hr.divider
 
     // Modal for choosing new schedule
     #scheduleModal.modal.fade(role='dialog')
