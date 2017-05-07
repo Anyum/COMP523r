@@ -42,8 +42,8 @@ exports.postStudentForm = (req, res, next) => {
         errors=[{msg: "Group size can only be 1 to 4"}];
     }
 
-    var projLetters = req.body.preferenceList.split(',');
-    console.log(projLetters.length);
+    var projLetters = req.body.preferenceList.toLowerCase().split(',');
+    //console.log(projLetters.length);
     if (projLetters.length != 12) {
         errors=[{msg: "Make sure you entered 12 comma-separated letters (i.e: a,b,c,d,e...) for project preferences"}];
     }

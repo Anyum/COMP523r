@@ -7,17 +7,6 @@ block content
     form.form-horizontal(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
 
-        //.form-group
-            label(class='col-sm-2 control-label', for='numStudents') Group Size
-            .col-sm-8
-                select
-                    option(value='1') 1
-                    option(value='2') 2
-                    option(value='3') 3
-                    option(value='4') 4
-
-                input.form-control(type='text', name='numStudents', id='numStudents', placeholder='Enter the number of students', autofocus=true)
-
         .form-group
             label(class='col-sm-2 control-label', for='numStudents') Group Size
             .col-sm-8
@@ -45,7 +34,7 @@ block content
         .form-group
             label(class='col-sm-2 control-label', for='preferenceList') Project Preferences (decreasing order)
             .col-sm-8
-                input.form-control(type='text', name='preferenceList', id='preferenceList', placeholder='separate project letters by a comma a one space i.e. (a, b, c, d, ...')
+                input.form-control(type='text', name='preferenceList', id='preferenceList', placeholder='separate all 12 project preference letters by a comma without any spaces i.e. a,b,c,d,e,f,g,h,i,j,k,l')
 
         .form-group
             .col-sm-offset-2.col-sm-8
